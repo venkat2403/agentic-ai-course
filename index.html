@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Agentic AI in Six Weeks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a lab-manual workbook. Header with the agent "stack" you build layer by layer, a tab strip of weeks, then one week at a time: idea, sources, build, quiz. */
+:root{
+  --paper:#EEF2EF; --surface:#FFFFFF; --sunk:#E3E9E5; --ink:#15201D; --muted:#55645E; --line:#CDD6D1;
+  --accent:#0A6860; --accent-ink:#FFFFFF; --accent-soft:#D6ECE8; --fill:#9ED5CC;
+  --signal:#A86300; --signal-soft:#FAE9CF;
+  --good:#23724A; --good-soft:#DCF0E3; --bad:#A63B2A; --bad-soft:#F7E0DA;
+  --f-display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1614; --surface:#17201D; --sunk:#1E2925; --ink:#E4EBE7; --muted:#97A7A0; --line:#2C3934;
+    --accent:#52C4B6; --accent-ink:#0B1513; --accent-soft:#163B36; --fill:#2A6A62;
+    --signal:#F0B254; --signal-soft:#3A2C14;
+    --good:#73CF96; --good-soft:#173324; --bad:#F2917D; --bad-soft:#3D1F19;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1614; --surface:#17201D; --sunk:#1E2925; --ink:#E4EBE7; --muted:#97A7A0; --line:#2C3934;
+  --accent:#52C4B6; --accent-ink:#0B1513; --accent-soft:#163B36; --fill:#2A6A62;
+  --signal:#F0B254; --signal-soft:#3A2C14;
+  --good:#73CF96; --good-soft:#173324; --bad:#F2917D; --bad-soft:#3D1F19;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:20px;padding-block:28px 48px}
+@media (max-width:480px){.wrap{padding-inline:16px}}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+.mono{font-family:var(--f-mono)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Header */
+.top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:32px;align-items:end;padding-bottom:24px;border-bottom:2px solid var(--ink)}
+@media (max-width:860px){.top{grid-template-columns:1fr;gap:22px}}
+.top h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2.7rem,7vw,4.8rem);line-height:.92;letter-spacing:.005em;text-transform:uppercase;margin-top:10px}
+.top h1 span{color:var(--accent)}
+.lede{margin-top:14px;max-width:60ch;color:var(--ink);font-size:1.05rem}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.fact{font-family:var(--f-mono);font-size:12px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted)}
+.stack{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 16px 14px}
+.stack-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
+.stack-head strong{font-family:var(--f-display);font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
+.layers{display:flex;flex-direction:column-reverse;gap:5px}
+.layer{display:grid;grid-template-columns:2.4em minmax(0,1fr) 3.2em;gap:8px;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:none;border:0;padding:0;text-align:left;cursor:pointer;width:100%}
+.layer .bar{position:relative;height:22px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.layer .fill{position:absolute;inset:0 auto 0 0;background:var(--fill);border-right:2px solid var(--accent);transition:width .4s ease}
+.layer .fill[style="width:0%"]{border-right:0}
+.layer .name{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--ink);font-size:12px;white-space:nowrap}
+.layer .pct{text-align:right;font-variant-numeric:tabular-nums}
+.layer:hover .bar{outline:1px solid var(--accent)}
+.stack-foot{margin-top:10px;font-size:12px;color:var(--muted)}
+
+/* Tabs */
+.tabs-wrap{overflow-x:auto;margin-top:20px;scrollbar-width:thin}
+.tabs{display:flex;gap:6px;min-width:max-content;padding-bottom:4px}
+.tab{font:inherit;font-family:var(--f-mono);font-size:13px;padding:8px 12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tab .dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.tab .dot.part{background:var(--signal)}
+.tab .dot.full{background:var(--good)}
+.tab[aria-selected="true"] .dot.none{background:var(--muted)}
+
+/* Panel */
+main{margin-top:22px}
+.wk-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:end;padding-bottom:18px;border-bottom:1px solid var(--line)}
+@media (max-width:640px){.wk-head{grid-template-columns:auto minmax(0,1fr)}.wk-meter{grid-column:1/-1}}
+.wk-num{display:flex;flex-direction:column;line-height:.85}
+.wk-num .big{font-family:var(--f-display);font-weight:800;font-size:clamp(4rem,10vw,6.5rem);color:var(--accent);font-variant-numeric:tabular-nums}
+.wk-title h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1;text-transform:uppercase;margin-top:6px}
+.goal{margin-top:10px;max-width:65ch;color:var(--muted)}
+.wk-meter{min-width:150px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--accent);transition:width .4s ease}
+.wk-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;margin-top:24px}
+@media (max-width:900px){.wk-grid{grid-template-columns:1fr}}
+.block+.block{margin-top:30px}
+.block h3,.card h3{font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;gap:10px;align-items:center}
+.block h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.prose{display:flex;flex-direction:column;gap:12px;max-width:68ch}
+.prose b{font-weight:600}
+.figure{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.figure svg{display:block;width:100%;min-width:520px;height:auto}
+.figcap{font-size:13px;color:var(--muted);margin-top:8px}
+.dg text{fill:var(--ink);font-family:var(--f-mono);font-size:12px}
+.dg .sm{font-size:10.5px;fill:var(--muted)}
+.dg .box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.dg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.dg .warn{fill:var(--signal-soft);stroke:var(--signal);stroke-width:1.5}
+.dg .arrow{stroke:var(--muted);stroke-width:1.5;fill:none}
+.dg .ahp{fill:var(--muted)}
+.dg .lane{fill:var(--sunk);stroke:none}
+
+/* Resources */
+.res{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.res li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.res li.is-done{background:var(--good-soft);border-color:transparent}
+.res li.is-done a.rt{text-decoration:line-through;text-decoration-color:var(--muted)}
+input[type=checkbox]{width:18px;height:18px;margin:3px 0 0;accent-color:var(--accent);cursor:pointer}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tag{font-family:var(--f-mono);font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid currentColor}
+.t-video{color:var(--accent)}
+.t-course{color:var(--signal)}
+.t-read{color:var(--ink)}
+.t-tool,.t-play{color:var(--good)}
+.t-live{color:var(--bad)}
+.opt{font-style:italic}
+a.rt{display:inline-block;font-weight:600;margin-top:3px}
+.note{font-size:14px;color:var(--muted);margin-top:3px}
+
+/* Build */
+.build{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px}
+.build h3::after{display:none}
+.build-title{font-family:var(--f-display);font-weight:700;font-size:1.6rem;text-transform:uppercase;line-height:1.05}
+.build-intro{margin-top:8px;color:var(--muted);max-width:66ch}
+.steps{list-style:none;counter-reset:s;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:22px 2em minmax(0,1fr);gap:10px;align-items:start;padding:10px 0;border-top:1px dashed var(--line)}
+.steps li::before{content:counter(s,decimal-leading-zero);grid-column:2;grid-row:1;font-family:var(--f-mono);font-size:12px;color:var(--accent);padding-top:3px}
+.steps li input{grid-column:1;grid-row:1}
+.steps li span{grid-column:3;grid-row:1}
+.steps li.is-done span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.done-when{margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-size:14px}
+.done-when b{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
+.cap-note{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--signal-soft);font-size:14px}
+
+/* Side */
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+dl.terms{margin:0;display:flex;flex-direction:column;gap:10px}
+dl.terms dt{font-weight:600;font-size:14px}
+dl.terms dd{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.prompt{border:1px solid var(--line);border-radius:8px;background:var(--sunk);padding:10px 12px;font-size:14px}
+.prompt+.prompt{margin-top:10px}
+.prompt p{white-space:pre-wrap}
+.copy{margin-top:8px;font:inherit;font-family:var(--f-mono);font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.copy:hover{background:var(--accent);color:var(--accent-ink)}
+.side-hint{font-size:13px;color:var(--muted);margin-bottom:10px}
+
+/* Quiz */
+.quiz{margin-top:30px}
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.qs{grid-template-columns:1fr}}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.q-text{font-weight:600;margin-bottom:10px}
+.q-text .mono{color:var(--accent);margin-right:6px;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt-btn{font:inherit;font-size:14px;text-align:left;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;line-height:1.4}
+.opt-btn:hover{border-color:var(--accent)}
+.opt-btn.right{background:var(--good-soft);border-color:var(--good)}
+.opt-btn.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.why{margin-top:10px;font-size:14px;padding:8px 10px;border-left:3px solid var(--line)}
+.why.ok{border-color:var(--good)}
+.why.no{border-color:var(--bad)}
+.why b{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
+
+.wk-nav{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+.navbtn{font:inherit;font-family:var(--f-mono);font-size:13px;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.navbtn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* Start / capstone / current */
+.intro-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px}
+@media (max-width:900px){.intro-grid{grid-template-columns:1fr}}
+.plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.plan li{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.plan li:last-child{border-bottom:1px solid var(--line)}
+.plan .n{font-family:var(--f-display);font-weight:800;font-size:2rem;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.plan .t{font-weight:600}
+.plan .s{font-size:14px;color:var(--muted)}
+.plan button{font:inherit;font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono);white-space:nowrap}
+.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.checklist li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
+.checklist li.is-done span{color:var(--muted);text-decoration:line-through}
+.checklist .when{font-family:var(--f-mono);font-size:11px;color:var(--signal);letter-spacing:.06em;margin-right:6px}
+.ideas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.ideas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.ideas{grid-template-columns:1fr}}
+.idea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.idea h4{margin:0;font-size:15px}
+.idea p{font-size:14px;color:var(--muted);margin-top:6px}
+.idea .meta{margin-top:8px}
+pre.tpl{margin:0;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--f-mono);font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-x:auto}
+.cost{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.cost div{display:grid;grid-template-columns:5.5em minmax(0,1fr);gap:10px}
+.cost .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.k.free{color:var(--good)} .k.paid{color:var(--signal)}
+.links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.links li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rhythm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.rhythm{grid-template-columns:1fr}}
+.rhythm div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.rhythm .d{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+.callout{background:var(--accent-soft);border-radius:10px;padding:14px 16px;max-width:70ch}
+
+footer{margin-top:40px;padding-top:16px;border-top:2px solid var(--ink);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+#sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:7px;vertical-align:middle}
+#sync.cloud::before{background:var(--good)}
+#sync.local::before{background:var(--signal)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Self-paced · No code · 6 weeks · 10–12 hrs a week</p>
+      <h1>Agentic AI <span>in Six Weeks</span></h1>
+      <p class="lede">A free path through the same syllabus as <i>Mastering Agentic AI</i>: build an assistant, ground it in your documents, turn it into an agent, test it, customize the model, and secure it. Every week pairs the best free videos with a hands-on project and a quiz.</p>
+      <div class="facts">
+        <span class="fact">35+ free sources</span><span class="fact">6 builds + capstone</span><span class="fact">24 quiz questions</span><span class="fact">Claude as your tutor</span>
+      </div>
+    </div>
+    <div class="stack" aria-label="Your agent stack progress">
+      <div class="stack-head"><span class="eyebrow">Your agent stack</span><strong id="overall">0%</strong></div>
+      <div class="layers" id="layers"></div>
+      <p class="stack-foot">Each week adds one layer. Tick sources and build steps, and answer the quiz, to fill it.</p>
+    </div>
+  </header>
+
+  <div class="tabs-wrap"><nav class="tabs" role="tablist" id="tabs" aria-label="Course sections"></nav></div>
+
+  <main id="panel" tabindex="-1"></main>
+
+  <footer>
+    <span id="sync">Progress saves in this browser</span>
+    <span>Built from free, public sources · links checked Oct 8, 2026</span>
+  </footer>
+</div>
+
+<script>
+const YT = id => "https://www.youtube.com/watch?v=" + id;
+const URLS = {
+  coursera: "https://www.coursera.org/learn/generative-ai-for-everyone",
+  dlai: "https://www.deeplearning.ai/courses/agentic-ai",
+  aca: s => "https://anthropic.skilljar.com/" + s,
+  gaCourse: "https://maven.com/aishwarya-srinivasan/mastering-ai-agents",
+};
+
+const WEEKS = [
+{
+  id:"w1", n:1, layer:"Model", title:"How LLMs actually work",
+  goal:"Understand what a large language model does, why it gets things wrong, and how to instruct it. Ship version 1 of an assistant you will keep upgrading all course.",
+  idea:[
+    "A large language model (LLM) does one thing: given some text, it predicts the next <b>token</b> (a chunk of a word, roughly three quarters of an English word), adds it, and repeats. Everything it seems to know is a compressed pattern from its training text, which stops at a <b>knowledge cutoff</b>.",
+    "Training happens in two stages. <b>Pre-training</b> on a huge slice of the internet produces a raw text predictor. <b>Post-training</b> on example conversations and human feedback turns that predictor into an assistant that follows instructions.",
+    "The <b>context window</b> is the model's working memory for one conversation: your instructions, any files, the chat so far, and tool results. If something isn't in the context window and wasn't in training, the model doesn't know it. Very long contexts dilute attention, so put what matters up front and keep it tidy.",
+    "Because the model writes plausible text instead of looking facts up, it can <b>hallucinate</b>: state something false with confidence. Most of this course is about fixing that, by grounding it in your documents (Week 2), giving it tools (Week 3) and testing it (Week 4).",
+    "Good instructions, called a <b>system prompt</b>, name the role, audience, task, rules and exact output format, ideally with one example. Reasoning models that think before answering handle hard multi-step problems better; fast models are cheaper for simple ones."
+  ],
+  terms:[["Token","A chunk of text the model reads and writes, about ¾ of a word."],["Context window","Everything the model can see in one conversation."],["System prompt","Standing instructions that shape every answer."],["Hallucination","Confident output that isn't true or grounded in a source."],["Knowledge cutoff","The date after which the model's training data stops."],["Temperature","How much randomness the model uses when picking words. Low for facts, higher for brainstorming."],["Structured output","A fixed format, such as a table or JSON, that other tools can read."]],
+  res:[
+    {t:"video",title:"Large Language Models explained briefly",src:"3Blue1Brown",len:"8 min",url:YT("LPZh9BOjkQs"),note:"Start here. The clearest picture of next-token prediction you'll find."},
+    {t:"video",title:"Deep Dive into LLMs like ChatGPT",src:"Andrej Karpathy",len:"3 hr 31 min",url:YT("7xTGNNLPyMI"),note:"Watch in two sittings. No coding: training, hallucinations, tools and the model's 'psychology'."},
+    {t:"course",title:"Generative AI for Everyone: Module 1",src:"Andrew Ng · Coursera",len:"~2 hr",url:URLS.coursera,note:"Choose the free audit option when you enroll. Module 1 covers how generative AI works and prompting."},
+    {t:"course",title:"AI Fluency: Framework & Foundations",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("ai-fluency-framework-foundations"),note:"How to work with AI effectively, efficiently and safely. Free account."},
+    {t:"video",title:"How I use LLMs",src:"Andrej Karpathy",len:"2 hr 11 min",url:YT("EWvNQjAaOHw"),note:"A practical tour of model choice, thinking models, search, files and tools.",opt:1},
+    {t:"course",title:"AI Capabilities and Limitations",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("ai-capabilities-and-limitations"),note:"A short introduction to how AI works and where it fails.",opt:1}
+  ],
+  build:{title:"Your assistant, version 1",
+    intro:"Pick one narrow job you would really use an assistant for: a trip planner that respects a budget, a study partner for a certification exam, a support bot for a small business, or a weekly explainer for a topic you follow. You'll upgrade this same assistant in later weeks.",
+    steps:[
+      "In Claude, create a Project for the assistant. Write its instructions under five headings: Role, Audience, Task, Rules, Output format. Include one example of a perfect answer.",
+      "In your learning log, write 10 test questions: 5 normal, 2 ambiguous, 1 out of scope, 1 that needs today's information, and 1 that tries to make it break a rule.",
+      "Run all 10. Mark each Pass or Fail with a one-line reason.",
+      "Change the instructions once, based on the failures, and run all 10 again.",
+      "Record the before and after pass counts. That table is your first evaluation; you'll formalize it in Week 4."
+    ],
+    done:"Instructions saved in a Project, 10 test questions, and a before/after score."},
+  quiz:[
+    {q:"What does an LLM fundamentally do when it answers you?",o:["Looks up the answer in a database","Predicts the next token again and again, based on patterns from training","Searches the web for every question","Follows a fixed set of hand-written rules"],a:1,why:"Search, files and tools are all added around that core next-token loop."},
+    {q:"Your assistant confidently quotes a refund policy your company never had. What is this called?",o:["Hallucination","Prompt injection","Overfitting","Latency"],a:0,why:"The model produced plausible text with no real source behind it. Grounding with your documents (Week 2) is the main fix."},
+    {q:"You paste a 300-page manual and the answers ignore the early chapters. The most likely cause?",o:["The temperature is too low","The model went offline","The context window is overloaded, so attention to early material is weak","LLMs can't read manuals"],a:2,why:"Long contexts dilute attention. Retrieval (Week 2) sends only the relevant passages."},
+    {q:"Which change most improves the consistency of answers?",o:["Writing the instructions in capital letters","Asking the same question twice","Saying please","A clear output format with one example"],a:3,why:"A format plus an example gives the model a concrete target to copy."}
+  ],
+  tutor:["Explain tokens, context windows and temperature to me with an everyday analogy. Then quiz me with 3 questions and tell me which ones I got wrong.","Here are my assistant's instructions and my 10 test results. Point out the weakest instruction and rewrite it.\n\n[paste instructions and results]"]
+},
+{
+  id:"w2", n:2, layer:"Knowledge", title:"Ground it in your documents",
+  goal:"Learn retrieval-augmented generation (RAG), context engineering and memory. Make your assistant answer from your own documents, with citations, and admit what it doesn't know.",
+  idea:[
+    "<b>RAG</b> turns a closed-book exam into an open-book one. Before the model answers, the system searches your documents, puts the most relevant passages into the context window, and tells the model to answer from them and cite them.",
+    "Behind the scenes, documents are split into <b>chunks</b>, and each chunk becomes an <b>embedding</b>: a list of numbers that captures its meaning. Embeddings live in a <b>vector database</b>. Your question is embedded the same way, and the closest chunks are retrieved.",
+    "<b>Context engineering</b> is deciding what goes into the context window on each turn: instructions, retrieved passages, recent chat, tool results and remembered facts. More is not better; irrelevant or conflicting material makes answers worse.",
+    "<b>Memory</b> comes in two kinds. Short-term memory is the current conversation. Long-term memory is facts saved and recalled in later conversations, such as a user's preferences.",
+    "Most RAG failures are retrieval failures: the right passage was never found, a chunk was cut mid-thought, two documents disagree, or an old document outranks a new one. When the answer isn't in the documents, a good system says so instead of guessing."
+  ],
+  diagram:"rag",
+  terms:[["RAG","Retrieve relevant passages, add them to the prompt, then generate."],["Chunk","A slice of a document small enough to retrieve on its own."],["Embedding","Numbers that represent meaning, so similar texts sit close together."],["Vector database","Storage built to find the embeddings closest to a query."],["Context engineering","Choosing what the model sees on each turn."],["Grounding","Tying answers to sources the reader can check."],["Long-term memory","Facts kept between conversations."]],
+  res:[
+    {t:"video",title:"What is Retrieval-Augmented Generation (RAG)?",src:"IBM Technology",len:"~7 min",url:YT("T-D1OfcDW1M"),note:"A whiteboard explanation with a memorable example."},
+    {t:"course",title:"Generative AI for Everyone: Module 2",src:"Andrew Ng · Coursera",len:"~2 hr",url:URLS.coursera,note:"Covers RAG, fine-tuning, model choice and the life cycle of an AI project."},
+    {t:"video",title:"RAG Explained: The Architecture Behind Agentic AI Systems",src:"The Gen Academy · free recording",len:"~1 hr",url:URLS.gaCourse,note:"On the course page, scroll to Free resources and choose Get recording. Same instructors as the paid course."},
+    {t:"course",title:"Claude 101",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("claude-101"),note:"Focus on Projects and adding knowledge."},
+    {t:"tool",title:"NotebookLM",src:"Google",len:"free",url:"https://notebooklm.google.com/",note:"A ready-made RAG system: upload sources, ask questions, get answers with citations."},
+    {t:"video",title:"How to Deploy AI Agents to Production (Live RAG Demo)",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/how-to-deploy-ai-agents-to-production-live-rag-dem",note:"See a RAG agent built and deployed live.",opt:1}
+  ],
+  build:{title:"Grounded Q&A over your own documents",
+    intro:"Collect 5 to 15 documents on your assistant's topic: manuals, policies, course notes, reports or saved web pages.",
+    steps:[
+      "Upload them to NotebookLM. Ask 10 questions and check that each answer points to a real passage.",
+      "Add the same documents to your Claude Project's knowledge and ask the same 10 questions.",
+      "Write 3 trap questions whose answers are NOT in the documents. Note which tool admits it doesn't know.",
+      "Update your assistant's instructions: answer only from the documents, name the source file, and say so when the answer isn't there.",
+      "In your log, build a 13-row table: question, NotebookLM result, Claude result, and the reason for any miss (wrong passage, missing information, or an instruction problem)."
+    ],
+    done:"Your assistant answers from your documents, cites them, admits gaps, and you have a comparison table."},
+  quiz:[
+    {q:"In RAG, what happens just before the model writes its answer?",o:["The model is retrained on your files","Relevant passages are retrieved and added to the prompt","The whole internet is searched","A cached answer is returned"],a:1,why:"Retrieve, add to the prompt, then generate. The model itself never changes."},
+    {q:"What is an embedding?",o:["A compressed PDF","A password for the vector database","A list of numbers that represents the meaning of a piece of text","A change to the model's weights"],a:2,why:"Texts with similar meaning get similar numbers. That's how retrieval finds relevant chunks."},
+    {q:"Your bot keeps quoting a 2023 policy even though the 2026 version is in the documents. Best fix?",o:["Remove or clearly label outdated documents and add dates","Raise the temperature","Make the instructions longer","Fine-tune the model"],a:0,why:"Stale and conflicting documents are a data problem. Clean the sources before touching the model."},
+    {q:"A question's answer is not in your documents. What should a well-built assistant do?",o:["Guess from general knowledge","Refuse to answer any more questions","Make up a citation","Say it couldn't find the answer in the documents"],a:3,why:"Admitting a gap is exactly what your trap questions test for."}
+  ],
+  tutor:["Walk me step by step through what happens inside a RAG system when I ask a question about my PDFs. Draw it as a simple text diagram.","Here are 3 answers my document bot got wrong, each with the question and the source passage. For each, tell me whether it's a retrieval, chunking or instruction problem.\n\n[paste]"]
+},
+{
+  id:"w3", n:3, layer:"Tools", title:"Make it an agent",
+  goal:"Understand how agents plan and use tools, what MCP is, and when a simple workflow beats an agent. Build a research agent in a visual, no-code builder.",
+  idea:[
+    "A <b>workflow</b> runs the model and tools along a path you designed in advance. An <b>agent</b> decides its own next step: it looks at the goal, picks a tool, reads the result, and repeats until it's done or hits a stop rule. Anthropic calls both 'agentic systems' and recommends starting with the simplest one that works.",
+    "<b>Tools</b> are actions the model can request: web search, a calculator, a calendar, a database, sending an email. The model writes a structured request, your system runs the tool, and the result goes back into the context window.",
+    "Common patterns: <b>prompt chaining</b> (step A feeds step B), <b>routing</b> (send each request to the right specialist), <b>reflection</b> (draft, critique, revise), <b>planning</b> (break a big task into steps), and <b>multi-agent</b> (a coordinator hands parts to specialist agents).",
+    "<b>MCP</b> (Model Context Protocol) is a standard plug that lets any AI app use any tool server, the way one USB-C cable fits many devices. When you connect Google Drive or a calendar to Claude, MCP is doing the work. <b>A2A</b> is a related standard for agents talking to other agents.",
+    "Agents cost more and fail in new ways: loops that never end, wrong tool choices, small errors that compound. Every agent needs a stop condition, a clear definition of done, and a human approval step before anything it can't undo."
+  ],
+  diagram:"loop",
+  terms:[["Agent","A model that chooses its own steps and tools in a loop."],["Workflow","A fixed sequence of model and tool steps you designed."],["Tool","An action the model can ask the system to run."],["MCP","Open standard for connecting AI apps to tools and data."],["Orchestrator","An agent that splits work and hands it to other agents."],["Reflection","The model critiques its own draft and improves it."],["Stop condition","A rule that ends the loop, such as a step limit."]],
+  res:[
+    {t:"video",title:"What are AI Agents?",src:"IBM Technology",len:"12 min",url:YT("F8NKVhkZZWI"),note:"From single models to compound systems that use tools."},
+    {t:"read",title:"Building effective agents",src:"Anthropic",len:"~25 min",url:"https://www.anthropic.com/engineering/building-effective-agents",note:"The clearest guide to workflows versus agents and the common patterns."},
+    {t:"course",title:"Agentic AI: videos in Modules 1, 2, 3 and 5",src:"Andrew Ng · DeepLearning.AI",len:"~2 hr of video",url:URLS.dlai,note:"Auditing is free and includes the videos. Skip the Python labs; the concepts are what you need."},
+    {t:"video",title:"What is MCP? Integrate AI Agents with Databases & APIs",src:"IBM Technology",len:"short",url:YT("eur8dUO9mvE"),note:"How agents plug into tools and data through one protocol."},
+    {t:"tool",title:"Build an AI chat agent with n8n",src:"n8n docs",len:"~1 hr",url:"https://docs.n8n.io/advanced-ai/intro-tutorial/",note:"The official step-by-step tutorial for this week's build."},
+    {t:"video",title:"Learn n8n to design, develop and deploy AI agents",src:"freeCodeCamp",len:"4 hr",url:"https://www.freecodecamp.org/news/learn-n8n-to-design-develop-and-deploy-production-grade-ai-agents/",note:"Watch the first 90 minutes now. The RAG and multi-agent parts make good Week 5 practice."},
+    {t:"live",title:"Beyond Simple Agents: Building with LangChain Deep Agents",src:"Gen Academy · free live session",len:"Mon, Oct 19",url:"https://maven.com/p/73db9b/beyond-simple-agents-building-with-lang-chain-deep-agents",note:"Sign up; registrants can usually get the recording if they miss it live.",opt:1},
+    {t:"course",title:"Introduction to Claude Cowork",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("introduction-to-claude-cowork"),note:"Multi-step agent work inside a tool you already use.",opt:1}
+  ],
+  build:{title:"A research and briefing agent in n8n",
+    intro:"n8n is a visual builder: you connect boxes instead of writing code. Its cloud trial lasts 14 days, so start it now to cover Weeks 3 and 4.",
+    steps:[
+      "Start the n8n Cloud free trial. Put the end date in your calendar and plan to export your workflows before then.",
+      "Get a model key. Google AI Studio offers Gemini keys with a free tier; OpenAI or Anthropic keys need a few dollars of credit. Check current limits when you sign up.",
+      "Follow the official 'Build an AI chat agent' tutorial from start to finish.",
+      "Add memory and two tools: a search tool (Wikipedia or web search) and a calculator.",
+      "Give it a job in its instructions: when I name a company or topic, research it and reply with a 5-bullet brief and sources.",
+      "Run it 5 times. Open one run's execution log and write down which tools it called, in what order, and why.",
+      "Add a maximum number of steps, plus a human approval step before any action that sends or posts something."
+    ],
+    done:"Your agent runs reliably, and you can explain every step in its execution log."},
+  quiz:[
+    {q:"What is the key difference between a workflow and an agent?",o:["Agents are always faster","Workflows can't use language models","An agent decides its own next steps and tools; a workflow follows a path you designed","There is no difference"],a:2,why:"That's Anthropic's definition: workflows follow predefined paths, agents direct their own process."},
+    {q:"MCP is best described as...",o:["A new language model","A standard way for AI apps to connect to tools and data","A type of vector database","A security certificate"],a:1,why:"One protocol, many tools: USB-C for AI apps."},
+    {q:"Your agent keeps searching in circles and never answers. First fix?",o:["Switch to a bigger model","Give it more tools","Remove its memory","Add a stop condition and a clear definition of done"],a:3,why:"Loops are a design problem. Limit the steps and say exactly what 'finished' looks like."},
+    {q:"What does Anthropic recommend about complexity?",o:["Start with the simplest solution and add agents only when they measurably help","Always use several agents","Fine-tune before anything else","Avoid tools"],a:0,why:"Many tasks are solved by one good prompt plus retrieval. Add complexity only when tests show it pays off."}
+  ],
+  tutor:["Here's a task from my work or life: [describe]. Should it be a single prompt, a workflow or an agent? List the steps and the tools each step needs.","Explain this n8n execution log to me in plain English, step by step.\n\n[paste]"]
+},
+{
+  id:"w4", n:4, layer:"Quality", title:"Test it with evals",
+  goal:"Learn how professionals measure AI quality: error analysis, golden datasets and LLM-as-judge. Build an eval kit in a spreadsheet and use it to make a measured improvement.",
+  idea:[
+    "Ordinary software tests check for one right answer. AI outputs vary, and many different answers can be good. So AI teams use <b>evals</b>: repeatable checks run on a fixed set of inputs.",
+    "Start with <b>error analysis</b>, not tools. Read 30 or more real outputs (called <b>traces</b> when they include every step and tool call), write a one-line note on anything wrong, then group the notes into categories and count them. Fix the biggest category first.",
+    "Build a <b>golden dataset</b>: inputs paired with what a good answer must contain. Then add two kinds of checks. <b>Rule checks</b> cover what you can verify mechanically: a source link is present, the reply is under 150 words, the format is right. <b>LLM-as-judge</b> checks use a second model to grade one specific failure as pass or fail.",
+    "A judge is only useful if it agrees with you. Label a sample yourself and measure agreement before trusting it. Pass/fail verdicts are clearer and more consistent than 1-to-5 scores.",
+    "Re-run the full set after every change, because fixing one problem often breaks another (a <b>regression</b>). Logging every run, including cost and response time, is called <b>observability</b>."
+  ],
+  terms:[["Eval","A repeatable test of AI output quality."],["Trace","The full record of one run: inputs, steps, tool calls, output."],["Error analysis","Reading outputs, noting failures and counting categories."],["Golden dataset","A fixed set of test inputs with what good looks like."],["LLM-as-judge","A model that grades another model's output."],["Regression","Something that used to work and broke after a change."],["Observability","Logging runs so you can see what happened and why."]],
+  res:[
+    {t:"course",title:"Agentic AI: Module 4 videos",src:"Andrew Ng · DeepLearning.AI",len:"~50 min",url:URLS.dlai,note:"Evals, error analysis, component-level evals, cost and latency."},
+    {t:"read",title:"Your AI Product Needs Evals",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/evals/",note:"The case for evals, with a real assistant as the example."},
+    {t:"read",title:"Creating a LLM-as-a-Judge That Drives Business Results",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/llm-judge/",note:"How to build a judge with a domain expert and pass/fail critiques."},
+    {t:"read",title:"A Field Guide to Rapidly Improving AI Products",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/field-guide/",note:"Error analysis in practice, and why looking at data beats dashboards."},
+    {t:"video",title:"Figma MCP vs. Paper MCP: What Evals Actually Tell You",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/figma-mcp-vs-paper-mcp-what-evals-actually-tell-yo",note:"Evals used to compare two real tools.",opt:1}
+  ],
+  build:{title:"An eval kit for your agent",
+    intro:"You need a spreadsheet and Claude. No code. Claude plays the judge.",
+    steps:[
+      "Run your Week 3 agent (or Week 2 assistant) on 30 varied inputs. Paste each input and output into a spreadsheet, one row each.",
+      "Read every row. In a Notes column, write one line about anything wrong.",
+      "Group the notes into 3 to 5 failure categories and count each.",
+      "For the biggest category, write a pass/fail judge prompt with 2 passing and 2 failing examples. Run it with Claude on all 30 rows.",
+      "Label 15 rows yourself and count how often the judge agrees with you. Revise the judge until it agrees at least 85% of the time.",
+      "Fix your agent's instructions or tools for that failure, re-run all 30, and record the pass rate before and after."
+    ],
+    cap:"Capstone: choose your idea this week and write a one-page spec. See the Capstone tab.",
+    done:"A sheet with notes, failure categories, judge agreement, and a before/after pass rate."},
+  quiz:[
+    {q:"What should you do before writing any evals?",o:["Build a dashboard","Choose a 1-to-10 rating scale","Read real outputs and note what goes wrong","Fine-tune the model"],a:2,why:"Error analysis tells you which evals are worth writing."},
+    {q:"Why prefer pass/fail judges over 1-to-5 scores?",o:["They're clearer, more consistent and easier to act on","They use fewer tokens","Models can't count to five","It's a legal requirement"],a:0,why:"A 3 versus a 4 is hard to interpret. Pass or fail on one specific failure tells you what to fix."},
+    {q:"How do you know your LLM judge can be trusted?",o:["Use the biggest model available","Compare its verdicts with your own labels on a sample","Ask it whether it's confident","Run it twice"],a:1,why:"Measure agreement with human labels. If it's low, fix the judge prompt."},
+    {q:"You changed the prompt and bug A is fixed. What next?",o:["Ship it","Delete the eval set","Test only bug A again","Re-run the whole eval set to catch regressions"],a:3,why:"Every change has side effects. The full set catches them."}
+  ],
+  tutor:["Here are 30 rows of my agent's inputs and outputs with my notes. Group the notes into failure categories, count them, and suggest which to fix first.\n\n[paste]","Write a pass/fail LLM-judge prompt for this failure: [describe]. Include 2 passing and 2 failing examples."]
+},
+{
+  id:"w5", n:5, layer:"Custom model", title:"Customize the model",
+  goal:"Know when to use prompting, RAG or fine-tuning. Run an open model on your own computer and prepare a fine-tuning dataset.",
+  idea:[
+    "You have three levers. <b>Prompt engineering</b> is cheapest, so try it first. <b>RAG</b> changes what the model knows. <b>Fine-tuning</b> changes how it behaves: its style, its format, or its skill at one narrow task.",
+    "Fine-tuning means training an existing model further on hundreds or thousands of example pairs (an input and the ideal output). It works well for consistent formats, classification and tone, and for teaching a small, cheap model to do one job well. It's a poor way to add fresh facts; use RAG for those.",
+    "<b>LoRA</b> trains a small add-on instead of every weight in the model, which makes fine-tuning affordable. <b>QLoRA</b> also compresses the model so it fits on a smaller graphics card. <b>Distillation</b> uses a big model's outputs to teach a small one.",
+    "<b>Open-weight</b> models can be downloaded and run on your own machine with an app like LM Studio. You gain privacy (data never leaves the computer), no per-message cost and offline use. You give up some capability, and <b>quantization</b> (compressing a model to fit) costs a little accuracy."
+  ],
+  terms:[["Fine-tuning","Extra training on example pairs to change behavior."],["LoRA / QLoRA","Cheap fine-tuning that trains a small add-on; QLoRA also compresses."],["Training example","One input paired with its ideal output."],["Open-weight model","A model whose files you can download and run."],["Quantization","Shrinking a model's numbers so it runs on smaller hardware."],["Distillation","Teaching a small model with a big model's answers."]],
+  res:[
+    {t:"video",title:"RAG vs Fine-Tuning vs Prompt Engineering",src:"IBM Technology",len:"short",url:YT("zYGDpG-pTho"),note:"The three levers side by side, with when to use each."},
+    {t:"video",title:"Optimizing Open Models for Production",src:"Gen Academy · free Lightning Lesson",len:"1 hr",url:"https://maven.com/p/89e3e1/optimizing-open-models-for-production",note:"From the same instructors as the paid course."},
+    {t:"tool",title:"LM Studio",src:"Free desktop app",len:"Mac · Windows · Linux",url:"https://lmstudio.ai/",note:"Download open models and chat with them offline."},
+    {t:"read",title:"LM Studio docs: getting started",src:"LM Studio",len:"~20 min",url:"https://lmstudio.ai/docs/app",note:"How to pick and download a model your machine can run."},
+    {t:"video",title:"Deep Dive into LLMs: the post-training section",src:"Andrej Karpathy",len:"rewatch ~30 min",url:YT("7xTGNNLPyMI"),note:"Revisit supervised fine-tuning with fresh eyes.",opt:1}
+  ],
+  build:{title:"Local model lab and a fine-tuning dataset",
+    intro:"For the second half, pick a narrow, repetitive task: turning messy notes into a fixed report format, sorting emails into 5 categories, or rewriting text in a house style.",
+    steps:[
+      "Install LM Studio and download one small model your computer can run. The app shows which ones fit.",
+      "Run your Week 1 test questions on the local model and on Claude. Grade both with your Week 4 judge, and note quality, speed and privacy.",
+      "With Claude's help, build 50 example pairs for your narrow task in a spreadsheet: input in one column, ideal output in the other. Check 20 by hand.",
+      "Try few-shot prompting first: put 5 examples in the instructions and test on 20 new inputs.",
+      "Write a half-page decision memo: prompting, RAG or fine-tuning for this task, with costs and risks.",
+      "Optional, usually a few dollars: upload the dataset to a provider that offers fine-tuning in a web dashboard (OpenAI does) and compare the tuned model with few-shot prompting on your eval set. Check current pricing first."
+    ],
+    cap:"Capstone: build the core flow end to end this week, about 3 hours.",
+    done:"A local versus cloud comparison, a 50-example dataset and a decision memo."},
+  quiz:[
+    {q:"Your assistant must know your new 2026 price list. Best lever?",o:["Fine-tuning","RAG","Raising the temperature","A longer system prompt without the prices"],a:1,why:"Facts that change belong in documents the system retrieves."},
+    {q:"What is fine-tuning best at?",o:["Adding yesterday's news","Fixing one typo in a prompt","Consistent behavior on a narrow task, learned from many examples","Making any model safe automatically"],a:2,why:"It shapes behavior and format, not up-to-date knowledge."},
+    {q:"What is the main idea of LoRA?",o:["Train a small add-on instead of all of the model's weights","Delete layers to make the model faster","Train a model from scratch","Rent bigger GPUs"],a:0,why:"Training a small adapter is far cheaper than updating billions of weights."},
+    {q:"A good reason to run a model locally?",o:["It's always smarter than cloud models","It needs no hardware","It searches the web automatically","Your data never leaves your machine"],a:3,why:"Privacy and no per-message cost are the main wins. Capability is usually lower."}
+  ],
+  tutor:["Here's my task and 5 examples. Argue for prompting, RAG and fine-tuning in turn, then pick one and explain why.\n\n[paste]","Create 50 varied input/output training pairs for this task as a two-column table, including 10 tricky edge cases: [describe the task]."]
+},
+{
+  id:"w6", n:6, layer:"Guardrails", title:"Secure it and ship",
+  goal:"Understand how agents get attacked and how to limit the damage. Red-team your own agent, add guardrails and ship your capstone.",
+  idea:[
+    "<b>Prompt injection</b> is the defining security problem for agents. Instructions hidden in content the agent reads (a web page, an email, a PDF) can override yours. Direct injection comes from the person typing; indirect injection hides in the data.",
+    "Simon Willison's <b>lethal trifecta</b>: if one agent can access private data, reads untrusted content, and can send information out, an attacker can trick it into leaking that data. Remove or gate at least one of the three.",
+    "Other common risks from the OWASP list: leaking sensitive information, <b>excessive agency</b> (more tools and permissions than the job needs), trusting model output without checks, unvetted plugins or MCP servers, and runaway usage costs.",
+    "Defenses come in layers: give each agent the fewest permissions possible, require human approval before anything irreversible, keep agents that read untrusted content apart from agents that can send, log every action, and set spending limits. No filter stops every attack, so design as if some get through.",
+    "Shipping also means watching it run: track failures and cost, keep your eval set running, version your instructions, and give users an easy way to report bad answers."
+  ],
+  diagram:"trifecta",
+  terms:[["Prompt injection","Input that hijacks the model's instructions."],["Indirect injection","Hostile instructions hidden in content the agent reads."],["Lethal trifecta","Private data + untrusted content + a way to send data out."],["Excessive agency","More tools or permissions than the job needs."],["Least privilege","Give each agent only what its job requires."],["Human in the loop","A person approves risky actions before they happen."],["Red-teaming","Attacking your own system to find weaknesses first."]],
+  res:[
+    {t:"video",title:"Prompt injection explained, with video, slides and a transcript",src:"Simon Willison",len:"~40 min",url:"https://simonwillison.net/2023/May/2/prompt-injection-explained/",note:"Why this attack is so hard to stop, from the person who named it."},
+    {t:"read",title:"The lethal trifecta for AI agents",src:"Simon Willison",len:"~15 min",url:"https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",note:"Private data, untrusted content and external communication."},
+    {t:"read",title:"OWASP Top 10 for LLM Applications",src:"OWASP GenAI Security Project",len:"skim 30 min",url:"https://genai.owasp.org/llm-top-10/",note:"The industry checklist of the most serious risks."},
+    {t:"video",title:"Secure AI Agents: Identity, Secrets & Access in Production",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/secure-ai-agents-identity-secrets-access-in-produc",note:"How production agents handle credentials and permissions."},
+    {t:"play",title:"Lakera's AI-hacking game",src:"Lakera",len:"45 min",url:"https://gandalf.lakera.ai/",note:"Trick AI systems into breaking their rules. The fastest way to understand injection."},
+    {t:"course",title:"Generative AI for Everyone: Module 3",src:"Andrew Ng · Coursera",len:"~2 hr",url:URLS.coursera,note:"Responsible AI, jobs and business impact. Useful if you'll lead AI work.",opt:1}
+  ],
+  build:{title:"Red-team your agent, then ship",
+    intro:"Attack first, then defend, then publish.",
+    steps:[
+      "Play the Lakera game for 45 minutes. Write down 3 tricks that worked.",
+      "Attack your own agent 10 ways: hide an instruction in a page or document it reads, ask it to reveal its instructions, push it off-topic, and ask it to take an action it shouldn't. Log each attempt as worked or failed.",
+      "Map your agent's trifecta: list its private data, its untrusted inputs, and its ways of sending data out. Remove or gate one.",
+      "Add guardrails: approval before sending or posting, a step limit, a spending limit, and clear refusal rules.",
+      "Re-run the attacks and your Week 4 eval set. Confirm the fixes held and nothing else broke.",
+      "Ship your capstone: record a 2-minute demo and publish the README (see the Capstone tab)."
+    ],
+    done:"An attack log, a trifecta map, and a shipped capstone."},
+  quiz:[
+    {q:"What is indirect prompt injection?",o:["A person typing too fast","Malicious instructions hidden in content the agent reads","The model forgetting earlier messages","A slow API"],a:1,why:"The attacker never talks to your agent directly; they plant instructions where it will read them."},
+    {q:"The lethal trifecta is...",o:["Speed, cost and accuracy","RAG, fine-tuning and prompting","Private data, untrusted content and a way to send data out","Model, tools and memory"],a:2,why:"All three together let an attacker steal data. Remove one leg."},
+    {q:"Best defense for an agent that can send email for you?",o:["Require your approval before each send","Politely ask the model to ignore attacks","Use a bigger model","Give it more memory"],a:0,why:"A human checkpoint stops the harmful action even when an injection gets through."},
+    {q:"'Excessive agency' means the agent...",o:["writes too creatively","answers too slowly","has too many users","has more tools or permissions than its job needs"],a:3,why:"Every extra permission is extra damage an attacker can cause."}
+  ],
+  tutor:["Act as an attacker. Here is my agent's setup: [describe its tools, data and inputs]. List 10 prompt-injection attacks to test, ranked by risk, with a defense for each.","Review my capstone README and demo script the way a hiring manager would. What's missing or unclear?\n\n[paste]"]
+}
+];
+
+const START_CHECKS = [
+  "Create a learning log (a doc or note) with three headings you'll fill each week: Learned, Broke, Questions.",
+  "Make a free Anthropic Academy account.",
+  "Make a free DeepLearning.AI account (to watch the Agentic AI videos).",
+  "Make a free Coursera account (to audit Generative AI for Everyone).",
+  "Have a Google account ready for NotebookLM (Week 2) and Google AI Studio (Week 3).",
+  "Block 10 to 12 hours a week on your calendar for the next six weeks.",
+  "Check your computer has about 10 GB free for a local model in Week 5."
+];
+const CAP_CHECKS = [
+  ["W4","Pick an idea and write a one-page spec: who it's for, the problem, inputs, outputs, tools, and what 'good' means."],
+  ["W5","Build the core flow end to end, even if it's rough."],
+  ["W5","Write 20 or more eval cases and record the first pass rate."],
+  ["W6","Add guardrails, map the trifecta, and re-run the evals."],
+  ["W6","Record a 2-minute demo."],
+  ["W6","Write the README."],
+  ["W6","Share it: a LinkedIn post, a portfolio page, or a demo for your team."]
+];
+const GA_MAP = [
+  ["Build the first prototype","Week 1: Your assistant, version 1"],
+  ["Add RAG, context and memory","Week 2: Grounded Q&A over your documents"],
+  ["Design an agentic system","Week 3: A research agent in n8n"],
+  ["Evaluate the agent","Week 4: An eval kit for your agent"],
+  ["Fine-tune an LLM","Week 5: Local model lab and dataset"],
+  ["Add security and safety","Week 6: Red-team, guardrails, ship"]
+];
+
+/* ---------- state ---------- */
+const LS_KEY = "agentic6-progress-v1", LS_TAB = "agentic6-tab";
+let state = {done:{}, quiz:{}, updated:0};
+function loadLocal(){
+  try{ const s = localStorage.getItem(LS_KEY); if(s){ const p = JSON.parse(s); state = {done:p.done||{}, quiz:p.quiz||{}, updated:p.updated||0}; } }catch(e){}
+}
+function saveLocal(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+let dbRef = null, saveTimer = null, saving = false, pending = false;
+function setSync(mode){
+  const el = document.getElementById("sync");
+  el.className = mode === "cloud" ? "cloud" : "local";
+  el.textContent = mode === "cloud" ? "Progress saves to your Claude account" : "Progress saves in this browser";
+}
+function persist(){
+  state.updated = Date.now();
+  saveLocal();
+  if(dbRef){ clearTimeout(saveTimer); saveTimer = setTimeout(flush, 700); }
+}
+async function flush(retried){
+  if(!dbRef) return;
+  if(saving){ pending = true; return; }
+  saving = true;
+  try{
+    await dbRef.set({done:state.done, quiz:state.quiz, updated:state.updated});
+    setSync("cloud");
+  }catch(e){
+    const code = e && e.code;
+    if(code === "unavailable" && !retried){ saving = false; setTimeout(()=>flush(true), 800 + Math.random()*1200); return; }
+    if(code === "invalid_argument" || code === "revoked" || code === "not_granted"){ dbRef = null; }
+    setSync("local");
+  }
+  saving = false;
+  if(pending){ pending = false; flush(); }
+}
+async function initCloud(){
+  const c = window.claude;
+  if(!c || typeof c.use !== "function"){ setSync("local"); return; }
+  try{
+    const [db, user] = await Promise.all([c.use("db"), c.use("user")]);
+    if(!db || !user){ setSync("local"); return; }
+    const uid = await user.id();
+    if(!uid){ setSync("local"); return; }
+    const ref = db.doc("data/users/" + uid + "/progress");
+    const snap = await ref.get();
+    dbRef = ref;
+    if(snap.exists){
+      const d = snap.data() || {};
+      if((d.updated||0) >= (state.updated||0)){
+        state = {done:Object.assign({}, d.done||{}), quiz:Object.assign({}, d.quiz||{}), updated:d.updated||0};
+        saveLocal(); renderAll(); setSync("cloud");
+      }else{ flush(); }
+    }else if(Object.keys(state.done).length || Object.keys(state.quiz).length){
+      flush();
+    }else{ setSync("cloud"); }
+  }catch(e){ setSync("local"); }
+}
+
+/* ---------- progress ---------- */
+function weekItems(w){
+  const keys = [];
+  w.res.forEach((r,i)=>{ if(!r.opt) keys.push(w.id+"-r"+i); });
+  w.build.steps.forEach((s,i)=>keys.push(w.id+"-b"+i));
+  return keys;
+}
+function weekPct(w){
+  const keys = weekItems(w);
+  let done = keys.filter(k=>state.done[k]).length;
+  w.quiz.forEach((q,i)=>{ if(state.quiz[w.id+"-q"+i] === q.a) done++; });
+  const total = keys.length + w.quiz.length;
+  return Math.round(100*done/total);
+}
+function listPct(prefix, n){
+  let d = 0; for(let i=0;i<n;i++) if(state.done[prefix+i]) d++;
+  return Math.round(100*d/n);
+}
+function overallPct(){
+  let done=0,total=0;
+  WEEKS.forEach(w=>{ const k=weekItems(w); total += k.length + w.quiz.length; done += k.filter(x=>state.done[x]).length; w.quiz.forEach((q,i)=>{ if(state.quiz[w.id+"-q"+i]===q.a) done++; }); });
+  for(let i=0;i<START_CHECKS.length;i++){ total++; if(state.done["st-"+i]) done++; }
+  for(let i=0;i<CAP_CHECKS.length;i++){ total++; if(state.done["cp-"+i]) done++; }
+  return Math.round(100*done/total);
+}
+
+/* ---------- tabs ---------- */
+const TABS = [{id:"start",label:"Start here"}].concat(WEEKS.map(w=>({id:w.id,label:"Week "+w.n}))).concat([{id:"capstone",label:"Capstone"},{id:"current",label:"Stay current"}]);
+let current = "start";
+function tabPct(id){
+  if(id==="start") return listPct("st-", START_CHECKS.length);
+  if(id==="capstone") return listPct("cp-", CAP_CHECKS.length);
+  if(id==="current") return -1;
+  return weekPct(WEEKS.find(w=>w.id===id));
+}
+function renderTabs(){
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = TABS.map(t=>{
+    const p = tabPct(t.id);
+    const cls = p<0 ? "" : (p>=100 ? "full" : p>0 ? "part" : "none");
+    const dot = p<0 ? "" : `<span class="dot ${cls}" aria-hidden="true"></span>`;
+    return `<button class="tab" role="tab" id="tab-${t.id}" aria-controls="panel" aria-selected="${t.id===current}" data-tab="${t.id}">${dot}${t.label}</button>`;
+  }).join("");
+}
+function renderStack(){
+  const el = document.getElementById("layers");
+  el.innerHTML = WEEKS.map(w=>{
+    const p = weekPct(w);
+    return `<button class="layer" data-tab="${w.id}" aria-label="Week ${w.n}, ${w.layer}: ${p}% complete"><span>W${w.n}</span><span class="bar"><span class="fill" style="width:${p}%"></span><span class="name">${w.layer}</span></span><span class="pct">${p}%</span></button>`;
+  }).join("");
+  document.getElementById("overall").textContent = overallPct() + "%";
+}
+function updateMeters(){
+  renderStack(); renderTabs();
+  const m = document.querySelector("[data-meter]");
+  if(m){ const id = m.getAttribute("data-meter"); const p = tabPct(id); m.querySelector("i").style.width = p+"%"; m.querySelector("span").textContent = p+"% complete"; }
+}
+
+/* ---------- diagrams ---------- */
+const ARROW = `<defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" class="ahp"/></marker></defs>`;
+function box(x,y,w,h,label,cls,sub){
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" class="${cls||"box"}"/><text x="${x+w/2}" y="${y+h/2+(sub?-2:4)}" text-anchor="middle">${label}</text>${sub?`<text x="${x+w/2}" y="${y+h/2+14}" text-anchor="middle" class="sm">${sub}</text>`:""}`;
+}
+const DIAGRAMS = {
+  rag:{cap:"Top row happens once, when you load documents. Bottom row happens on every question.",svg:`<svg class="dg" viewBox="0 0 700 230" role="img" aria-label="RAG pipeline: documents are chunked, embedded and stored; questions are embedded, matched to the closest chunks, and answered with citations.">${ARROW}
+<rect x="0" y="6" width="700" height="96" rx="10" class="lane"/><rect x="0" y="128" width="700" height="96" rx="10" class="lane"/>
+<text x="14" y="26" class="sm">LOAD, ONCE</text><text x="14" y="148" class="sm">ASK, EVERY TIME</text>
+${box(14,38,140,50,"Your documents","box","PDFs, notes")}${box(190,38,140,50,"Chunks","box","short passages")}${box(366,38,140,50,"Embeddings","box","meaning as numbers")}${box(542,38,144,50,"Vector database","hot")}
+${box(14,160,140,50,"Your question","box")}${box(190,160,140,50,"Find closest","box","top 3–5 chunks")}${box(366,160,140,50,"Prompt","box","question + chunks")}${box(542,160,144,50,"Answer + sources","hot")}
+<path d="M154 63 H188" class="arrow" marker-end="url(#ah)"/><path d="M330 63 H364" class="arrow" marker-end="url(#ah)"/><path d="M506 63 H540" class="arrow" marker-end="url(#ah)"/>
+<path d="M154 185 H188" class="arrow" marker-end="url(#ah)"/><path d="M330 185 H364" class="arrow" marker-end="url(#ah)"/><path d="M506 185 H540" class="arrow" marker-end="url(#ah)"/>
+<path d="M614 88 V112 H260 V158" class="arrow" marker-end="url(#ah)"/></svg>`},
+  loop:{cap:"The agent loop. The model chooses the next tool each time round; your stop rule and approval step keep it safe.",svg:`<svg class="dg" viewBox="0 0 700 250" role="img" aria-label="Agent loop: goal, plan, act with a tool, observe the result, check if done; loop back to plan or finish. A stop rule and an approval step guard the loop.">${ARROW}
+${box(14,96,120,54,"Goal","box","from you")}
+${box(186,30,140,54,"Plan","hot","pick next step")}
+${box(400,30,140,54,"Act","hot","call a tool")}
+${box(400,166,140,54,"Observe","hot","read the result")}
+${box(186,166,140,54,"Done?","box","check the goal")}
+${box(572,96,116,54,"Answer","box","to you")}
+<path d="M134 123 H160 V57 H184" class="arrow" marker-end="url(#ah)"/>
+<path d="M326 57 H398" class="arrow" marker-end="url(#ah)"/>
+<path d="M470 84 V164" class="arrow" marker-end="url(#ah)"/>
+<path d="M400 193 H328" class="arrow" marker-end="url(#ah)"/>
+<path d="M256 166 V86" class="arrow" marker-end="url(#ah)"/><text x="264" y="130" class="sm">not yet</text>
+<path d="M256 220 V238 H630 V152" class="arrow" marker-end="url(#ah)"/><text x="420" y="234" class="sm">yes</text>
+<rect x="560" y="10" width="128" height="62" rx="8" class="warn"/><text x="624" y="34" text-anchor="middle" class="sm">STOP RULE</text><text x="624" y="52" text-anchor="middle" class="sm">max steps · approval</text>
+</svg>`},
+  trifecta:{cap:"Any agent with all three can be tricked into leaking data. Take away one leg, or put a human approval on it.",svg:`<svg class="dg" viewBox="0 0 700 250" role="img" aria-label="The lethal trifecta: private data, untrusted content and a way to send data out. All three together create risk.">
+<path d="M350 40 L150 210 L550 210 Z" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 6"/>
+${box(270,14,160,56,"Private data","warn","files, email, accounts")}
+${box(60,186,190,56,"Untrusted content","warn","web pages, inbound email")}
+${box(450,186,190,56,"Can send data out","warn","email, links, APIs")}
+<text x="350" y="144" text-anchor="middle">All three in one agent</text>
+<text x="350" y="164" text-anchor="middle" class="sm">= an attacker can steal data</text>
+</svg>`}
+};
+
+/* ---------- rendering ---------- */
+const TAGS = {video:"Video",course:"Course",read:"Read",tool:"Tool",play:"Play",live:"Live"};
+function chk(key, label){
+  return `<input type="checkbox" data-k="${key}" id="c-${key}" ${state.done[key]?"checked":""} aria-label="${label.replace(/"/g,"&quot;")}">`;
+}
+function resItem(w,r,i){
+  const k = w.id+"-r"+i;
+  return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Mark done: "+r.title)}<div style="min-width:0"><div class="meta"><span class="tag t-${r.t}">${TAGS[r.t]}</span><span>${r.src} · ${r.len}</span>${r.opt?'<span class="opt">Optional</span>':""}</div><a class="rt" href="${r.url}" target="_blank" rel="noopener">${r.title}</a><p class="note">${r.note}</p></div></li>`;
+}
+function quizItem(w,q,i){
+  const k = w.id+"-q"+i, pick = state.quiz[k];
+  const answered = pick !== undefined && pick !== null;
+  const opts = q.o.map((o,j)=>{
+    let cls = "";
+    if(answered){ if(j===q.a && pick===q.a) cls="right"; else if(j===pick) cls="wrong"; }
+    return `<button class="opt-btn ${cls}" data-q="${k}" data-i="${j}" aria-pressed="${pick===j}">${o}</button>`;
+  }).join("");
+  let why = "";
+  if(answered){ why = pick===q.a ? `<p class="why ok"><b>Correct</b>${q.why}</p>` : `<p class="why no"><b>Not quite</b>Try another option.</p>`; }
+  return `<div class="q"><p class="q-text"><span class="mono">Q${i+1}</span>${q.q}</p><div class="opts">${opts}</div>${why}</div>`;
+}
+function tutorBlock(list){
+  return list.map(p=>`<div class="prompt"><p>${p.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</p><button class="copy" data-copy>Copy prompt</button></div>`).join("");
+}
+function meterHtml(id){
+  const p = tabPct(id);
+  return `<div class="wk-meter" data-meter="${id}"><span>${p}% complete</span><div class="meter"><i style="width:${p}%"></i></div></div>`;
+}
+function renderWeek(w){
+  const idx = WEEKS.indexOf(w);
+  const prev = idx===0 ? {id:"start",label:"Start here"} : {id:WEEKS[idx-1].id,label:"Week "+WEEKS[idx-1].n};
+  const next = idx===WEEKS.length-1 ? {id:"capstone",label:"Capstone"} : {id:WEEKS[idx+1].id,label:"Week "+WEEKS[idx+1].n};
+  const dg = w.diagram ? `<div class="figure">${DIAGRAMS[w.diagram].svg}<p class="figcap">${DIAGRAMS[w.diagram].cap}</p></div>` : "";
+  return `
+  <section aria-labelledby="h-${w.id}">
+    <div class="wk-head">
+      <div class="wk-num"><span class="eyebrow">Week</span><span class="big">0${w.n}</span></div>
+      <div class="wk-title"><p class="eyebrow">Layer ${w.n} · ${w.layer} · 10–12 hrs</p><h2 id="h-${w.id}">${w.title}</h2><p class="goal">${w.goal}</p></div>
+      ${meterHtml(w.id)}
+    </div>
+    <div class="wk-grid">
+      <div style="min-width:0">
+        <section class="block"><h3>The idea</h3><div class="prose">${w.idea.map(p=>`<p>${p}</p>`).join("")}</div>${dg}</section>
+        <section class="block"><h3>Watch &amp; read · about 4–5 hrs</h3><ul class="res">${w.res.map((r,i)=>resItem(w,r,i)).join("")}</ul></section>
+        <section class="block build"><h3>Build · about 5 hrs</h3><p class="build-title">${w.build.title}</p><p class="build-intro">${w.build.intro}</p>
+          <ol class="steps">${w.build.steps.map((s,i)=>{const k=w.id+"-b"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Step "+(i+1)+" done")}<span>${s}</span></li>`;}).join("")}</ol>
+          ${w.build.cap?`<p class="cap-note">${w.build.cap}</p>`:""}
+          <p class="done-when"><b>Done when</b>${w.build.done}</p>
+        </section>
+      </div>
+      <aside class="side">
+        <section class="card"><h3>Key terms</h3><dl class="terms">${w.terms.map(t=>`<div><dt>${t[0]}</dt><dd>${t[1]}</dd></div>`).join("")}</dl></section>
+        <section class="card"><h3>Ask your tutor</h3><p class="side-hint">Paste these into a Claude chat when you get stuck or finish a step.</p>${tutorBlock(w.tutor)}</section>
+      </aside>
+    </div>
+    <section class="block quiz"><h3>Check yourself · 4 questions</h3><div class="qs">${w.quiz.map((q,i)=>quizItem(w,q,i)).join("")}</div></section>
+    <nav class="wk-nav" aria-label="Week navigation"><button class="navbtn" data-tab="${prev.id}">← ${prev.label}</button><button class="navbtn primary" data-tab="${next.id}">${next.label} →</button></nav>
+  </section>`;
+}
+function renderStart(){
+  return `
+  <section aria-labelledby="h-start">
+    <div class="wk-head">
+      <div class="wk-num"><span class="eyebrow">Week</span><span class="big">00</span></div>
+      <div class="wk-title"><p class="eyebrow">Before you begin · 1 hr</p><h2 id="h-start">Start here</h2><p class="goal">How the course works, what it costs, and the setup to finish before Week 1.</p></div>
+      ${meterHtml("start")}
+    </div>
+    <div class="intro-grid" style="margin-top:24px">
+      <div style="min-width:0">
+        <section class="block"><h3>How it works</h3><div class="prose">
+          <p>This course follows the same six-week path as <i>Mastering Agentic AI</i> from The Gen Academy, using only free material. Each week adds one layer to the AI system you're building, and each week has the same parts: the idea in plain English, sources to watch and read, a hands-on build, and a four-question quiz.</p>
+          <p>You won't need to write code. You'll build in tools with visual interfaces: Claude Projects, NotebookLM, n8n, LM Studio and a spreadsheet.</p>
+          <p>What you don't get compared with the paid course: live instructors, a cohort and their certificate. In their place, Claude is your tutor. Every week has ready-made prompts you can paste into a chat to get explanations, feedback on your work, or extra quiz questions.</p>
+        </div></section>
+        <section class="block"><h3>The six weeks</h3><ul class="plan">${WEEKS.map(w=>`<li><span class="n">0${w.n}</span><div style="min-width:0"><p class="t">${w.title}</p><p class="s">Build: ${w.build.title}</p></div><button data-tab="${w.id}">Open</button></li>`).join("")}</ul></section>
+        <section class="block"><h3>Mapped to the paid course</h3><div class="tbl-wrap"><table><thead><tr><th>Gen Academy week</th><th>This course</th></tr></thead><tbody>${GA_MAP.map((r,i)=>`<tr><td><span class="mono" style="color:var(--muted)">0${i+1}</span> ${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</tbody></table></div></section>
+      </div>
+      <aside class="side">
+        <section class="card"><h3>Setup checklist</h3><ul class="checklist">${START_CHECKS.map((c,i)=>{const k="st-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c)}<span>${c}</span></li>`;}).join("")}</ul></section>
+        <section class="card"><h3>What it costs</h3><div class="cost">
+          <div><span class="k free">Free</span><span>Every video, course and reading here; NotebookLM; LM Studio; the Lakera game; Claude if you already use it.</span></div>
+          <div><span class="k paid">Maybe</span><span>n8n Cloud after its 14-day trial (Starter is about €24 a month), only if you keep building there.</span></div>
+          <div><span class="k paid">Maybe</span><span>A few dollars of AI model credit for n8n, if you don't use a free tier.</span></div>
+          <div><span class="k paid">Optional</span><span>A small fine-tuning run in Week 5, usually a few dollars. Check current prices first.</span></div>
+        </div></section>
+      </aside>
+    </div>
+    <section class="block" style="margin-top:30px"><h3>A week at 10–12 hours</h3><div class="rhythm">
+      <div><p class="d">MON · TUE · 3 hrs</p><p>Watch the main videos. Pause and write one sentence per idea in your learning log.</p></div>
+      <div><p class="d">WED · THU · 3 hrs</p><p>Finish the reading, then start the build: set up accounts and do the first steps.</p></div>
+      <div><p class="d">SAT · SUN · 5 hrs</p><p>Finish the build, take the quiz, and write Learned / Broke / Questions in your log.</p></div>
+    </div></section>
+    <nav class="wk-nav" aria-label="Week navigation"><span></span><button class="navbtn primary" data-tab="w1">Week 1 →</button></nav>
+  </section>`;
+}
+function renderCapstone(){
+  const ideas = [
+    ["Daily research brief","Watches the companies, markets or topics you follow and sends a sourced 5-bullet brief each morning.","tools · schedule · evals"],
+    ["Support desk agent","Answers customer questions from a business's policy documents and hands hard cases to a person.","RAG · routing · approval"],
+    ["Inbox triage","Sorts incoming email into categories and drafts replies, never sending without your approval.","classify · tools · trifecta"],
+    ["Meeting to actions","Turns meeting notes or transcripts into tasks with owners and due dates in your task app.","extraction · MCP · format"],
+    ["Job-hunt copilot","Matches job posts to a resume and drafts tailored cover letters, with reasons for each match.","RAG · reflection · evals"],
+    ["Trip planner with rules","Plans trips within a budget, dates and preferences, checking real options before suggesting them.","tools · planning · guardrails"]
+  ];
+  const tpl = `# [Agent name]
+
+Problem: who it's for and what it saves them.
+How it works: a simple diagram of the steps and tools.
+Tools and data: what it can read, what it can do,
+  and what needs approval.
+Evals: number of cases, pass rate before → after,
+  and the biggest failure you fixed.
+Risks: your trifecta map and the guardrails you added.
+Demo: link to a 2-minute video.
+Next: what you would build next.`;
+  return `
+  <section aria-labelledby="h-cap">
+    <div class="wk-head">
+      <div class="wk-num"><span class="eyebrow">Final</span><span class="big">★</span></div>
+      <div class="wk-title"><p class="eyebrow">Weeks 4–6 · about 3 hrs a week</p><h2 id="h-cap">Capstone: one agent you can show</h2><p class="goal">The paid course ends with an end-to-end capstone, and so does this one. It's the piece you'll point to in a job interview or a team meeting.</p></div>
+      ${meterHtml("capstone")}
+    </div>
+    <div class="wk-grid">
+      <div style="min-width:0">
+        <section class="block"><h3>Requirements</h3><div class="prose"><p>Your capstone should solve a real problem for you or a business, and use at least three of these: retrieval over documents, tools or connectors, memory, a multi-step workflow, and human approval. It needs an eval set of 20 or more cases with a pass rate, a trifecta map with at least two guardrails, a 2-minute demo and a one-page README.</p></div></section>
+        <section class="block"><h3>Ideas to start from</h3><div class="ideas">${ideas.map(d=>`<div class="idea"><h4>${d[0]}</h4><p>${d[1]}</p><div class="meta">${d[2]}</div></div>`).join("")}</div></section>
+        <section class="block"><h3>Where to build it</h3><div class="prose">
+          <p><b>n8n</b> is best for scheduled and multi-app automations. Keep it after the trial on the Starter plan (about €24 a month; check current pricing).</p>
+          <p><b>Claude</b> works with no extra subscription if you already use it: a Project holds the knowledge, connectors reach your apps, and scheduled tasks run it on a timetable.</p>
+        </div></section>
+        <section class="block"><h3>README template</h3><pre class="tpl" id="tpl">${tpl.replace(/</g,"&lt;")}</pre><button class="copy" data-copy-pre="tpl">Copy template</button></section>
+        <section class="block"><h3>After the course</h3><div class="prose">
+          <p><b>For an AI job:</b> put the capstone, your Week 4 eval sheet and your Week 6 attack log in a portfolio. Roles open to non-coders include AI automation specialist, AI product manager and AI implementation consultant. Learning basic Python next opens up AI engineering; the <a href="https://huggingface.co/learn/agents-course" target="_blank" rel="noopener">Hugging Face Agents Course</a> and <a href="https://academy.langchain.com/" target="_blank" rel="noopener">LangChain Academy</a> are free.</p>
+          <p><b>To lead AI work:</b> score possible use cases on four things: value, how often the task happens, the cost of a mistake, and whether the data exists. Start where mistakes are cheap and easy to catch. Module 3 of Generative AI for Everyone covers the business side.</p>
+        </div></section>
+      </div>
+      <aside class="side">
+        <section class="card"><h3>Milestones</h3><ul class="checklist">${CAP_CHECKS.map((c,i)=>{const k="cp-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c[1])}<span><span class="when">${c[0]}</span>${c[1]}</span></li>`;}).join("")}</ul></section>
+        <section class="card"><h3>Ask your tutor</h3>${tutorBlock(["Here's my capstone idea: [describe]. Turn it into a one-page spec: user, problem, inputs, outputs, tools, risks and what a passing answer looks like.","Here's my capstone spec. Suggest 20 eval cases, including 5 edge cases and 3 prompt-injection attempts.\n\n[paste]"])}</section>
+      </aside>
+    </div>
+    <nav class="wk-nav" aria-label="Week navigation"><button class="navbtn" data-tab="w6">← Week 6</button><button class="navbtn primary" data-tab="current">Stay current →</button></nav>
+  </section>`;
+}
+function renderCurrent(){
+  const src = [
+    ["read","The Batch","DeepLearning.AI · weekly","https://www.deeplearning.ai/the-batch","Andrew Ng's weekly newsletter. The best single summary of what changed."],
+    ["read","Simon Willison's Weblog","near-daily","https://simonwillison.net/","Hands-on, skeptical and the clearest writer on agent security."],
+    ["read","Engineering at Anthropic","occasional","https://www.anthropic.com/engineering","How agents are built in practice, from the team behind Claude."],
+    ["video","IBM Technology","YouTube","https://www.youtube.com/@IBMTechnology","Short whiteboard explainers whenever a new term appears."],
+    ["video","Andrej Karpathy","YouTube","https://www.youtube.com/@AndrejKarpathy","Long, clear lectures on how models work."],
+    ["live","Gen Academy Live Labs","free · live","https://thegenacademy.com/live-labs","Free sessions with people building AI at Google, NVIDIA, LinkedIn and others."],
+    ["live","Aish & Arvind on Maven","free Lightning Lessons","https://maven.com/aishwarya-srinivasan","Free live sessions and recordings from the paid course's instructors."],
+    ["read","Latent Space","podcast + newsletter","https://www.latent.space/","Interviews with AI engineers; more technical, good once you're comfortable."]
+  ];
+  return `
+  <section aria-labelledby="h-cur">
+    <div class="wk-head">
+      <div class="wk-num"><span class="eyebrow">Ongoing</span><span class="big">∞</span></div>
+      <div class="wk-title"><p class="eyebrow">After week 6 · 30 minutes a week</p><h2 id="h-cur">Stay current</h2><p class="goal">AI news moves weekly, but the foundations you've learned change slowly. A small, steady habit keeps you current without drowning.</p></div>
+    </div>
+    <section class="block" style="margin-top:24px"><h3>The weekly habit</h3><div class="rhythm">
+      <div><p class="d">MONDAY · 10 MIN</p><p>Skim The Batch. Note one item that touches something you've built.</p></div>
+      <div><p class="d">MIDWEEK · 15 MIN</p><p>Watch one short video or Live Lab from the list below.</p></div>
+      <div><p class="d">FRIDAY · 5 MIN</p><p>Write three lines in your log: what changed, whether it matters to you, and whether to try it.</p></div>
+    </div></section>
+    <section class="block"><h3>The filter</h3><p class="callout">For any AI headline, ask one question: does this change what's possible, what it costs, or what can go wrong for something I build or use? If the answer is no, skip it without guilt.</p></section>
+    <section class="block"><h3>Sources worth following</h3><ul class="links">${src.map(s=>`<li><div class="meta"><span class="tag t-${s[0]}">${TAGS[s[0]]}</span><span>${s[2]}</span></div><a class="rt" href="${s[3]}" target="_blank" rel="noopener">${s[1]}</a><p class="note">${s[4]}</p></li>`).join("")}</ul></section>
+    <nav class="wk-nav" aria-label="Week navigation"><button class="navbtn" data-tab="capstone">← Capstone</button><button class="navbtn primary" data-tab="start">Back to start</button></nav>
+  </section>`;
+}
+function renderPanel(){
+  const p = document.getElementById("panel");
+  if(current==="start") p.innerHTML = renderStart();
+  else if(current==="capstone") p.innerHTML = renderCapstone();
+  else if(current==="current") p.innerHTML = renderCurrent();
+  else p.innerHTML = renderWeek(WEEKS.find(w=>w.id===current));
+}
+function renderAll(){ renderStack(); renderTabs(); renderPanel(); }
+function go(id, scroll){
+  if(!TABS.some(t=>t.id===id)) return;
+  current = id;
+  try{ localStorage.setItem(LS_TAB, id); }catch(e){}
+  try{ history.replaceState(null, "", "#"+id); }catch(e){}
+  renderTabs(); renderPanel();
+  if(scroll){ const t = document.querySelector(".tabs-wrap"); if(t) t.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); }
+  const tab = document.getElementById("tab-"+id); if(tab && tab.scrollIntoView) tab.scrollIntoView({block:"nearest", inline:"nearest"});
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-tab]");
+  if(t){ go(t.getAttribute("data-tab"), !t.classList.contains("tab")); return; }
+  const o = e.target.closest(".opt-btn");
+  if(o){
+    const k = o.getAttribute("data-q"), i = +o.getAttribute("data-i");
+    state.quiz[k] = i; persist();
+    const [wid, qn] = k.split("-q"); const w = WEEKS.find(x=>x.id===wid);
+    const holder = o.closest(".q"); const tmp = document.createElement("div");
+    tmp.innerHTML = quizItem(w, w.quiz[+qn], +qn); holder.replaceWith(tmp.firstElementChild);
+    updateMeters(); return;
+  }
+  const c = e.target.closest("[data-copy],[data-copy-pre]");
+  if(c){
+    const src = c.hasAttribute("data-copy-pre") ? document.getElementById(c.getAttribute("data-copy-pre")) : c.previousElementSibling;
+    const text = src.textContent;
+    const done = ()=>{ const old = c.textContent; c.textContent = "Copied"; setTimeout(()=>{ c.textContent = old; }, 1400); };
+    const fallback = ()=>{ try{ const r = document.createRange(); r.selectNodeContents(src); const s = getSelection(); s.removeAllRanges(); s.addRange(r); c.textContent = "Selected: press Ctrl/⌘+C"; }catch(err){} };
+    try{ navigator.clipboard.writeText(text).then(done, fallback); }catch(err){ fallback(); }
+  }
+});
+document.addEventListener("change", e=>{
+  const cb = e.target.closest("input[type=checkbox][data-k]");
+  if(!cb) return;
+  const k = cb.getAttribute("data-k");
+  if(cb.checked) state.done[k] = true; else delete state.done[k];
+  const li = cb.closest("li"); if(li) li.classList.toggle("is-done", cb.checked);
+  persist(); updateMeters();
+});
+document.getElementById("tabs").addEventListener("keydown", e=>{
+  if(e.key!=="ArrowRight" && e.key!=="ArrowLeft") return;
+  const i = TABS.findIndex(t=>t.id===current); const n = TABS[(i + (e.key==="ArrowRight"?1:-1) + TABS.length) % TABS.length];
+  go(n.id); const b = document.getElementById("tab-"+n.id); if(b) b.focus();
+});
+
+/* ---------- boot ---------- */
+loadLocal();
+(function(){
+  let start = "start";
+  const h = (location.hash||"").slice(1);
+  if(TABS.some(t=>t.id===h)) start = h;
+  else { try{ const s = localStorage.getItem(LS_TAB); if(s && TABS.some(t=>t.id===s)) start = s; }catch(e){} }
+  current = start;
+})();
+renderAll();
+setSync("local");
+initCloud();
+</script>
+
+</body>
+</html>
