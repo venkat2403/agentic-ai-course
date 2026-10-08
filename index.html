@@ -246,9 +246,9 @@ footer{margin-top:40px;padding-top:16px;border-top:2px solid var(--ink);display:
     <div>
       <p class="eyebrow">Self-paced · No code · 6 weeks · 10–12 hrs a week</p>
       <h1>Agentic AI <span>in Six Weeks</span></h1>
-      <p class="lede">A free path through the same syllabus as <i>Mastering Agentic AI</i>: build an assistant, ground it in your documents, turn it into an agent, test it, customize the model, and secure it. Every week pairs the best free videos with a hands-on project and a quiz.</p>
+      <p class="lede">A free path from zero to building your own AI agents: build an assistant, ground it in your documents, turn it into an agent, test it, customize the model, and secure it. Every week pairs the best free videos with a hands-on project and a quiz.</p>
       <div class="facts">
-        <span class="fact">40+ free sources</span><span class="fact">6 builds + capstone</span><span class="fact">24 quiz questions</span><span class="fact">Claude as your tutor</span>
+        <span class="fact">35+ free sources</span><span class="fact">6 builds + capstone</span><span class="fact">24 quiz questions</span><span class="fact">Claude as your tutor</span>
       </div>
     </div>
     <div class="stack" aria-label="Your agent stack progress">
@@ -273,8 +273,7 @@ const YT = id => "https://www.youtube.com/watch?v=" + id;
 const URLS = {
   coursera: "https://www.coursera.org/learn/generative-ai-for-everyone",
   dlai: "https://www.deeplearning.ai/courses/agentic-ai",
-  aca: s => "https://anthropic.skilljar.com/" + s,
-  gaCourse: "https://maven.com/aishwarya-srinivasan/mastering-ai-agents",
+  aca: s => "https://anthropic.skilljar.com/" + s
 };
 
 const WEEKS = [
@@ -331,10 +330,8 @@ const WEEKS = [
   res:[
     {t:"video",title:"What is Retrieval-Augmented Generation (RAG)?",src:"IBM Technology",len:"~7 min",url:YT("T-D1OfcDW1M"),note:"A whiteboard explanation with a memorable example."},
     {t:"course",title:"Generative AI for Everyone: Module 2",src:"Andrew Ng · Coursera",len:"~2 hr",url:URLS.coursera,note:"Covers RAG, fine-tuning, model choice and the life cycle of an AI project."},
-    {t:"video",title:"RAG Explained: The Architecture Behind Agentic AI Systems",src:"The Gen Academy · free recording",len:"~1 hr",url:URLS.gaCourse,note:"On the course page, scroll to Free resources and choose Get recording. Same instructors as the paid course."},
     {t:"course",title:"Claude 101",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("claude-101"),note:"Focus on Projects and adding knowledge."},
     {t:"tool",title:"NotebookLM",src:"Google",len:"free",url:"https://notebooklm.google.com/",note:"A ready-made RAG system: upload sources, ask questions, get answers with citations."},
-    {t:"video",title:"How to Deploy AI Agents to Production (Live RAG Demo)",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/how-to-deploy-ai-agents-to-production-live-rag-dem",note:"See a RAG agent built and deployed live.",opt:1},
     {t:"read",title:"LLM Wiki: a knowledge base the model maintains",src:"Andrej Karpathy · GitHub",len:"~10 min",url:"https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f",note:"An April 2026 alternative to RAG for personal knowledge: the model keeps a linked wiki of your sources up to date.",opt:1}
   ],
   build:{title:"Grounded Q&A over your own documents",
@@ -376,7 +373,6 @@ const WEEKS = [
     {t:"read",title:"Equipping agents for the real world with Agent Skills",src:"Anthropic",len:"~15 min",url:"https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",note:"What skills are and how agents use them. Now an open standard used beyond Claude."},
     {t:"tool",title:"Build an AI chat agent with n8n",src:"n8n docs",len:"~1 hr",url:"https://docs.n8n.io/advanced-ai/intro-tutorial/",note:"The official step-by-step tutorial for this week's build."},
     {t:"video",title:"Learn n8n to design, develop and deploy AI agents",src:"freeCodeCamp",len:"4 hr",url:"https://www.freecodecamp.org/news/learn-n8n-to-design-develop-and-deploy-production-grade-ai-agents/",note:"Watch the first 90 minutes now. The RAG and multi-agent parts make good Week 5 practice."},
-    {t:"live",title:"Beyond Simple Agents: Building with LangChain Deep Agents",src:"Gen Academy · free live session",len:"Mon, Oct 19",url:"https://maven.com/p/73db9b/beyond-simple-agents-building-with-lang-chain-deep-agents",note:"Sign up; registrants can usually get the recording if they miss it live.",opt:1},
     {t:"course",title:"Introduction to Claude Cowork",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("introduction-to-claude-cowork"),note:"Multi-step agent work inside a tool you already use.",opt:1}
   ],
   build:{title:"A research and briefing agent in n8n",
@@ -415,7 +411,6 @@ const WEEKS = [
     {t:"read",title:"Your AI Product Needs Evals",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/evals/",note:"The case for evals, with a real assistant as the example."},
     {t:"read",title:"Creating a LLM-as-a-Judge That Drives Business Results",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/llm-judge/",note:"How to build a judge with a domain expert and pass/fail critiques."},
     {t:"read",title:"A Field Guide to Rapidly Improving AI Products",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/field-guide/",note:"Error analysis in practice, and why looking at data beats dashboards."},
-    {t:"video",title:"Figma MCP vs. Paper MCP: What Evals Actually Tell You",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/figma-mcp-vs-paper-mcp-what-evals-actually-tell-yo",note:"Evals used to compare two real tools.",opt:1},
     {t:"read",title:"AI Evals: Everything You Need to Know",src:"Hamel Husain & Shreya Shankar",len:"reference",url:"https://hamel.dev/blog/posts/evals-faq/",note:"Updated September 2026. Answers to 60+ practical questions; dip in when you hit a specific problem.",opt:1}
   ],
   build:{title:"An eval kit for your agent",
@@ -450,10 +445,9 @@ const WEEKS = [
   terms:[["Fine-tuning","Extra training on example pairs to change behavior."],["LoRA / QLoRA","Cheap fine-tuning that trains a small add-on; QLoRA also compresses."],["Training example","One input paired with its ideal output."],["Open-weight model","A model whose files you can download and run."],["Quantization","Shrinking a model's numbers so it runs on smaller hardware."],["Distillation","Teaching a small model with a big model's answers."]],
   res:[
     {t:"video",title:"RAG vs Fine-Tuning vs Prompt Engineering",src:"IBM Technology",len:"short",url:YT("zYGDpG-pTho"),note:"The three levers side by side, with when to use each."},
-    {t:"video",title:"Optimizing Open Models for Production",src:"Gen Academy · free Lightning Lesson",len:"1 hr",url:"https://maven.com/p/89e3e1/optimizing-open-models-for-production",note:"From the same instructors as the paid course."},
     {t:"tool",title:"LM Studio",src:"Free desktop app",len:"Mac · Windows · Linux",url:"https://lmstudio.ai/",note:"Download open models and chat with them offline."},
     {t:"read",title:"LM Studio docs: getting started",src:"LM Studio",len:"~20 min",url:"https://lmstudio.ai/docs/app",note:"How to pick and download a model your machine can run."},
-    {t:"video",title:"Deep Dive into LLMs: the post-training section",src:"Andrej Karpathy",len:"rewatch ~30 min",url:YT("7xTGNNLPyMI"),note:"Revisit supervised fine-tuning with fresh eyes.",opt:1}
+    {t:"video",title:"Deep Dive into LLMs: the post-training section",src:"Andrej Karpathy",len:"rewatch ~30 min",url:YT("7xTGNNLPyMI"),note:"Revisit supervised fine-tuning with fresh eyes."}
   ],
   build:{title:"Local model lab and a fine-tuning dataset",
     intro:"For the second half, pick a narrow, repetitive task: turning messy notes into a fixed report format, sorting emails into 5 categories, or rewriting text in a house style.",
@@ -492,7 +486,6 @@ const WEEKS = [
     {t:"read",title:"The lethal trifecta for AI agents",src:"Simon Willison",len:"~15 min",url:"https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",note:"Private data, untrusted content and external communication."},
     {t:"read",title:"OWASP Top 10 for LLM Applications (2025)",src:"OWASP GenAI Security Project",len:"skim 20 min",url:"https://genai.owasp.org/llm-top-10/",note:"The industry checklist of the most serious risks. The 2025 list is the current one on OWASP's site."},
     {t:"read",title:"OWASP Top 10 for Agentic Applications (2026)",src:"OWASP GenAI Security Project",len:"skim 20 min",url:"https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",note:"Released December 2025: the top risks specific to autonomous agents. Download the PDF from the page."},
-    {t:"video",title:"Secure AI Agents: Identity, Secrets & Access in Production",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/secure-ai-agents-identity-secrets-access-in-produc",note:"How production agents handle credentials and permissions."},
     {t:"play",title:"Gandalf by Lakera",src:"Lakera · free",len:"45 min",url:"https://gandalf.lakera.ai/",note:"Trick AI systems into breaking their rules. The link now opens Lakera's Agent Breaker challenges. The fastest way to understand injection."},
     {t:"course",title:"Generative AI for Everyone: Module 3",src:"Andrew Ng · Coursera",len:"~2 hr",url:URLS.coursera,note:"Responsible AI, jobs and business impact. Useful if you'll lead AI work.",opt:1}
   ],
@@ -534,14 +527,6 @@ const CAP_CHECKS = [
   ["W6","Record a 2-minute demo."],
   ["W6","Write the README."],
   ["W6","Share it: a LinkedIn post, a portfolio page, or a demo for your team."]
-];
-const GA_MAP = [
-  ["Build the first prototype","Week 1: Your assistant, version 1"],
-  ["Add RAG, context and memory","Week 2: Grounded Q&A over your documents"],
-  ["Design an agentic system","Week 3: A research agent in n8n"],
-  ["Evaluate the agent","Week 4: An eval kit for your agent"],
-  ["Fine-tune an LLM","Week 5: Local model lab and dataset"],
-  ["Add security and safety","Week 6: Red-team, guardrails, ship"]
 ];
 
 /* ---------- state ---------- */
@@ -799,12 +784,11 @@ function renderStart(){
     <div class="intro-grid" style="margin-top:24px">
       <div style="min-width:0">
         <section class="block"><h3>How it works</h3><div class="prose">
-          <p>This course follows the same six-week path as <i>Mastering Agentic AI</i> from The Gen Academy, using only free material. Each week adds one layer to the AI system you're building, and each week has the same parts: the idea in plain English, sources to watch and read, a hands-on build, and a four-question quiz.</p>
+          <p>This course covers the full agentic AI stack in six weeks, using only free material. Each week adds one layer to the AI system you're building, and each week has the same parts: the idea in plain English, sources to watch and read, a hands-on build, and a four-question quiz.</p>
           <p>You won't need to write code. You'll build in tools with visual interfaces: Claude Projects, NotebookLM, n8n, LM Studio and a spreadsheet.</p>
-          <p>What you don't get compared with the paid course: live instructors, a cohort and their certificate. In their place, Claude is your tutor. Every week has ready-made prompts you can paste into a chat to get explanations, feedback on your work, or extra quiz questions.</p>
+          <p>There are no live instructors. Claude is your tutor instead. Every week has ready-made prompts you can paste into a chat to get explanations, feedback on your work, or extra quiz questions.</p>
         </div></section>
         <section class="block"><h3>The six weeks</h3><ul class="plan">${WEEKS.map(w=>`<li><span class="n">0${w.n}</span><div style="min-width:0"><p class="t">${w.title}</p><p class="s">Build: ${w.build.title}</p></div><button data-tab="${w.id}">Open</button></li>`).join("")}</ul></section>
-        <section class="block"><h3>Mapped to the paid course</h3><div class="tbl-wrap"><table><thead><tr><th>Gen Academy week</th><th>This course</th></tr></thead><tbody>${GA_MAP.map((r,i)=>`<tr><td><span class="mono" style="color:var(--muted)">0${i+1}</span> ${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</tbody></table></div></section>
       </div>
       <aside class="side">
         <section class="card"><h3>Setup checklist</h3><ul class="checklist">${START_CHECKS.map((c,i)=>{const k="st-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c)}<label class="lbl txt" for="c-${k}">${c}</label></li>`;}).join("")}</ul></section>
@@ -848,7 +832,7 @@ Next: what you would build next.`;
   <section aria-labelledby="h-cap">
     <div class="wk-head">
       <div class="wk-num"><span class="eyebrow">Final</span><span class="big">★</span></div>
-      <div class="wk-title"><p class="eyebrow">Weeks 4–6 · about 3 hrs a week</p><h2 id="h-cap">Capstone: one agent you can show</h2><p class="goal">The paid course ends with an end-to-end capstone, and so does this one. It's the piece you'll point to in a job interview or a team meeting.</p></div>
+      <div class="wk-title"><p class="eyebrow">Weeks 4–6 · about 3 hrs a week</p><h2 id="h-cap">Capstone: one agent you can show</h2><p class="goal">The course ends with an end-to-end capstone. It's the piece you'll point to in a job interview or a team meeting.</p></div>
       ${meterHtml("capstone")}
     </div>
     <div class="wk-grid">
@@ -880,8 +864,6 @@ function renderCurrent(){
     ["read","Engineering at Anthropic","occasional","https://www.anthropic.com/engineering","How agents are built in practice, from the team behind Claude."],
     ["video","IBM Technology","YouTube","https://www.youtube.com/@IBMTechnology","Short whiteboard explainers whenever a new term appears."],
     ["video","Andrej Karpathy","YouTube","https://www.youtube.com/@AndrejKarpathy","Long, clear lectures on how models work."],
-    ["live","Gen Academy Live Labs","free · live","https://thegenacademy.com/live-labs","Free sessions with people building AI at Google, NVIDIA, LinkedIn and others."],
-    ["live","Aish & Arvind on Maven","free Lightning Lessons","https://maven.com/aishwarya-srinivasan","Free live sessions and recordings from the paid course's instructors."],
     ["read","Latent Space","podcast + newsletter","https://www.latent.space/","Interviews with AI engineers; more technical, good once you're comfortable."]
   ];
   return `

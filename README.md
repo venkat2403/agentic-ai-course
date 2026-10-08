@@ -1,6 +1,6 @@
 # Agentic AI in Six Weeks
 
-A free, self-paced, no-code course on building AI agents. It follows the same six-week syllabus as *Mastering Agentic AI* (The Gen Academy), using only free, public videos, courses and readings.
+A free, self-paced, no-code course on building AI agents, using only free, public videos, courses and readings.
 
 Open `index.html` in any browser to use it. Progress (ticked sources, build steps and quiz answers) saves in your browser.
 
@@ -28,7 +28,6 @@ Each week has a plain-English explanation, 4–5 hours of curated free sources, 
 - Hamel Husain and Shreya Shankar on evals, LLM-as-judge and the AI Evals FAQ (September 2026)
 - Simon Willison on prompt injection and the lethal trifecta; OWASP Top 10 for LLM Applications (2025) and for Agentic Applications (2026)
 - Andrej Karpathy's LLM Wiki (April 2026) as an alternative to RAG for personal knowledge
-- Free Live Labs and Lightning Lessons from The Gen Academy
 - Tools: Claude Projects, NotebookLM, n8n, LM Studio, Gandalf by Lakera
 
 Links and facts were checked on October 8, 2026. The page works on phones as well as computers.
