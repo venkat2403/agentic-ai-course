@@ -23,14 +23,15 @@ Each week has a plain-English explanation, 4–5 hours of curated free sources, 
 
 - Andrej Karpathy: *Deep Dive into LLMs like ChatGPT* and *How I use LLMs* (YouTube)
 - Andrew Ng: *Generative AI for Everyone* (Coursera, free audit) and *Agentic AI* (DeepLearning.AI, free audit)
-- Anthropic Academy courses and *Building effective agents*
+- Anthropic Academy courses, *Building effective agents* and *Agent Skills*
 - IBM Technology explainers on agents, RAG, MCP and fine-tuning
-- Hamel Husain on evals and LLM-as-judge
-- Simon Willison on prompt injection and the lethal trifecta; OWASP Top 10 for LLM Applications
+- Hamel Husain and Shreya Shankar on evals, LLM-as-judge and the AI Evals FAQ (September 2026)
+- Simon Willison on prompt injection and the lethal trifecta; OWASP Top 10 for LLM Applications (2025) and for Agentic Applications (2026)
+- Andrej Karpathy's LLM Wiki (April 2026) as an alternative to RAG for personal knowledge
 - Free Live Labs and Lightning Lessons from The Gen Academy
-- Tools: Claude Projects, NotebookLM, n8n, LM Studio, Lakera's AI-hacking game
+- Tools: Claude Projects, NotebookLM, n8n, LM Studio, Gandalf by Lakera
 
-Links were checked on October 8, 2026.
+Links and facts were checked on October 8, 2026. The page works on phones as well as computers.
 
 ## Costs
 

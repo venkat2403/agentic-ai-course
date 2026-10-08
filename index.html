@@ -71,7 +71,7 @@ p{margin:0}
 .stack-foot{margin-top:10px;font-size:12px;color:var(--muted)}
 
 /* Tabs */
-.tabs-wrap{overflow-x:auto;margin-top:20px;scrollbar-width:thin}
+.tabs-wrap{overflow-x:auto;margin-top:20px;scrollbar-width:thin;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:8px;box-shadow:0 1px 0 var(--line)}
 .tabs{display:flex;gap:6px;min-width:max-content;padding-bottom:4px}
 .tab{font:inherit;font-family:var(--f-mono);font-size:13px;padding:8px 12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
@@ -83,7 +83,12 @@ p{margin:0}
 /* Panel */
 main{margin-top:22px}
 .wk-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:end;padding-bottom:18px;border-bottom:1px solid var(--line)}
-@media (max-width:640px){.wk-head{grid-template-columns:auto minmax(0,1fr)}.wk-meter{grid-column:1/-1}}
+@media (max-width:640px){
+  .wk-head{grid-template-columns:1fr;gap:10px}
+  .wk-num{flex-direction:row;align-items:baseline;gap:10px}
+  .wk-num .big{font-size:3.6rem}
+  .wk-title h2{font-size:2.1rem}
+}
 .wk-num{display:flex;flex-direction:column;line-height:.85}
 .wk-num .big{font-family:var(--f-display);font-weight:800;font-size:clamp(4rem,10vw,6.5rem);color:var(--accent);font-variant-numeric:tabular-nums}
 .wk-title h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1;text-transform:uppercase;margin-top:6px}
@@ -99,7 +104,9 @@ main{margin-top:22px}
 .prose{display:flex;flex-direction:column;gap:12px;max-width:68ch}
 .prose b{font-weight:600}
 .figure{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
-.figure svg{display:block;width:100%;min-width:520px;height:auto}
+.figure svg{display:block;width:100%;height:auto}
+.figure .tall{display:none;max-width:420px;margin:0 auto}
+@media (max-width:640px){.figure .wide{display:none}.figure .tall{display:block}}
 .figcap{font-size:13px;color:var(--muted);margin-top:8px}
 .dg text{fill:var(--ink);font-family:var(--f-mono);font-size:12px}
 .dg .sm{font-size:10.5px;fill:var(--muted)}
@@ -136,8 +143,8 @@ a.rt{display:inline-block;font-weight:600;margin-top:3px}
 .steps li{counter-increment:s;display:grid;grid-template-columns:22px 2em minmax(0,1fr);gap:10px;align-items:start;padding:10px 0;border-top:1px dashed var(--line)}
 .steps li::before{content:counter(s,decimal-leading-zero);grid-column:2;grid-row:1;font-family:var(--f-mono);font-size:12px;color:var(--accent);padding-top:3px}
 .steps li input{grid-column:1;grid-row:1}
-.steps li span{grid-column:3;grid-row:1}
-.steps li.is-done span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.steps li .txt{grid-column:3;grid-row:1}
+.steps li.is-done .txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
 .done-when{margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-size:14px}
 .done-when b{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
 .cap-note{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--signal-soft);font-size:14px}
@@ -193,7 +200,7 @@ th{font-family:var(--f-mono);font-weight:500;font-size:11px;letter-spacing:.08em
 td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono);white-space:nowrap}
 .checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
 .checklist li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
-.checklist li.is-done span{color:var(--muted);text-decoration:line-through}
+.checklist li.is-done .txt{color:var(--muted);text-decoration:line-through}
 .checklist .when{font-family:var(--f-mono);font-size:11px;color:var(--signal);letter-spacing:.06em;margin-right:6px}
 .ideas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:900px){.ideas{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -215,6 +222,18 @@ pre.tpl{margin:0;background:var(--sunk);border:1px solid var(--line);border-radi
 .rhythm .d{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
 .callout{background:var(--accent-soft);border-radius:10px;padding:14px 16px;max-width:70ch}
 
+label.lbl{cursor:pointer}
+@media (pointer:coarse){
+  input[type=checkbox]{width:24px;height:24px;margin-top:0}
+  .res li,.steps li,.checklist li{grid-template-columns:28px minmax(0,1fr)}
+  .steps li{grid-template-columns:28px 2em minmax(0,1fr)}
+  .opt-btn{padding:11px 12px}
+  .copy{padding:8px 12px}
+}
+@media (max-width:640px){
+  .layer .bar{height:28px}
+  .tab{padding:10px 12px}
+}
 footer{margin-top:40px;padding-top:16px;border-top:2px solid var(--ink);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 #sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:7px;vertical-align:middle}
 #sync.cloud::before{background:var(--good)}
@@ -229,7 +248,7 @@ footer{margin-top:40px;padding-top:16px;border-top:2px solid var(--ink);display:
       <h1>Agentic AI <span>in Six Weeks</span></h1>
       <p class="lede">A free path through the same syllabus as <i>Mastering Agentic AI</i>: build an assistant, ground it in your documents, turn it into an agent, test it, customize the model, and secure it. Every week pairs the best free videos with a hands-on project and a quiz.</p>
       <div class="facts">
-        <span class="fact">35+ free sources</span><span class="fact">6 builds + capstone</span><span class="fact">24 quiz questions</span><span class="fact">Claude as your tutor</span>
+        <span class="fact">40+ free sources</span><span class="fact">6 builds + capstone</span><span class="fact">24 quiz questions</span><span class="fact">Claude as your tutor</span>
       </div>
     </div>
     <div class="stack" aria-label="Your agent stack progress">
@@ -304,7 +323,8 @@ const WEEKS = [
     "Behind the scenes, documents are split into <b>chunks</b>, and each chunk becomes an <b>embedding</b>: a list of numbers that captures its meaning. Embeddings live in a <b>vector database</b>. Your question is embedded the same way, and the closest chunks are retrieved.",
     "<b>Context engineering</b> is deciding what goes into the context window on each turn: instructions, retrieved passages, recent chat, tool results and remembered facts. More is not better; irrelevant or conflicting material makes answers worse.",
     "<b>Memory</b> comes in two kinds. Short-term memory is the current conversation. Long-term memory is facts saved and recalled in later conversations, such as a user's preferences.",
-    "Most RAG failures are retrieval failures: the right passage was never found, a chunk was cut mid-thought, two documents disagree, or an old document outranks a new one. When the answer isn't in the documents, a good system says so instead of guessing."
+    "Most RAG failures are retrieval failures: the right passage was never found, a chunk was cut mid-thought, two documents disagree, or an old document outranks a new one. When the answer isn't in the documents, a good system says so instead of guessing.",
+    "RAG isn't the only option for a small personal collection. Some builders now skip the vector database and let the model maintain a linked wiki of their notes, which it reads directly (Andrej Karpathy's LLM Wiki idea from April 2026, linked below)."
   ],
   diagram:"rag",
   terms:[["RAG","Retrieve relevant passages, add them to the prompt, then generate."],["Chunk","A slice of a document small enough to retrieve on its own."],["Embedding","Numbers that represent meaning, so similar texts sit close together."],["Vector database","Storage built to find the embeddings closest to a query."],["Context engineering","Choosing what the model sees on each turn."],["Grounding","Tying answers to sources the reader can check."],["Long-term memory","Facts kept between conversations."]],
@@ -314,7 +334,8 @@ const WEEKS = [
     {t:"video",title:"RAG Explained: The Architecture Behind Agentic AI Systems",src:"The Gen Academy · free recording",len:"~1 hr",url:URLS.gaCourse,note:"On the course page, scroll to Free resources and choose Get recording. Same instructors as the paid course."},
     {t:"course",title:"Claude 101",src:"Anthropic Academy",len:"self-paced",url:URLS.aca("claude-101"),note:"Focus on Projects and adding knowledge."},
     {t:"tool",title:"NotebookLM",src:"Google",len:"free",url:"https://notebooklm.google.com/",note:"A ready-made RAG system: upload sources, ask questions, get answers with citations."},
-    {t:"video",title:"How to Deploy AI Agents to Production (Live RAG Demo)",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/how-to-deploy-ai-agents-to-production-live-rag-dem",note:"See a RAG agent built and deployed live.",opt:1}
+    {t:"video",title:"How to Deploy AI Agents to Production (Live RAG Demo)",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/how-to-deploy-ai-agents-to-production-live-rag-dem",note:"See a RAG agent built and deployed live.",opt:1},
+    {t:"read",title:"LLM Wiki: a knowledge base the model maintains",src:"Andrej Karpathy · GitHub",len:"~10 min",url:"https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f",note:"An April 2026 alternative to RAG for personal knowledge: the model keeps a linked wiki of your sources up to date.",opt:1}
   ],
   build:{title:"Grounded Q&A over your own documents",
     intro:"Collect 5 to 15 documents on your assistant's topic: manuals, policies, course notes, reports or saved web pages.",
@@ -342,15 +363,17 @@ const WEEKS = [
     "<b>Tools</b> are actions the model can request: web search, a calculator, a calendar, a database, sending an email. The model writes a structured request, your system runs the tool, and the result goes back into the context window.",
     "Common patterns: <b>prompt chaining</b> (step A feeds step B), <b>routing</b> (send each request to the right specialist), <b>reflection</b> (draft, critique, revise), <b>planning</b> (break a big task into steps), and <b>multi-agent</b> (a coordinator hands parts to specialist agents).",
     "<b>MCP</b> (Model Context Protocol) is a standard plug that lets any AI app use any tool server, the way one USB-C cable fits many devices. When you connect Google Drive or a calendar to Claude, MCP is doing the work. <b>A2A</b> is a related standard for agents talking to other agents.",
+    "<b>Agent Skills</b>, published by Anthropic as an open standard in late 2025, are folders of instructions (sometimes with scripts) that an agent loads only when a task needs them. A simple way to remember it: MCP gives an agent access to tools, and skills give it the know-how to do a job well.",
     "Agents cost more and fail in new ways: loops that never end, wrong tool choices, small errors that compound. Every agent needs a stop condition, a clear definition of done, and a human approval step before anything it can't undo."
   ],
   diagram:"loop",
-  terms:[["Agent","A model that chooses its own steps and tools in a loop."],["Workflow","A fixed sequence of model and tool steps you designed."],["Tool","An action the model can ask the system to run."],["MCP","Open standard for connecting AI apps to tools and data."],["Orchestrator","An agent that splits work and hands it to other agents."],["Reflection","The model critiques its own draft and improves it."],["Stop condition","A rule that ends the loop, such as a step limit."]],
+  terms:[["Agent","A model that chooses its own steps and tools in a loop."],["Workflow","A fixed sequence of model and tool steps you designed."],["Tool","An action the model can ask the system to run."],["MCP","Open standard for connecting AI apps to tools and data."],["Orchestrator","An agent that splits work and hands it to other agents."],["Skill","A folder of instructions an agent loads when a task needs it."],["Reflection","The model critiques its own draft and improves it."],["Stop condition","A rule that ends the loop, such as a step limit."]],
   res:[
     {t:"video",title:"What are AI Agents?",src:"IBM Technology",len:"12 min",url:YT("F8NKVhkZZWI"),note:"From single models to compound systems that use tools."},
-    {t:"read",title:"Building effective agents",src:"Anthropic",len:"~25 min",url:"https://www.anthropic.com/engineering/building-effective-agents",note:"The clearest guide to workflows versus agents and the common patterns."},
+    {t:"read",title:"Building effective agents",src:"Anthropic",len:"~25 min",url:"https://www.anthropic.com/engineering/building-effective-agents",note:"Written in late 2024. Anthropic notes the tools have changed since, but the patterns still hold, and it remains the clearest guide to workflows versus agents."},
     {t:"course",title:"Agentic AI: videos in Modules 1, 2, 3 and 5",src:"Andrew Ng · DeepLearning.AI",len:"~2 hr of video",url:URLS.dlai,note:"Auditing is free and includes the videos. Skip the Python labs; the concepts are what you need."},
     {t:"video",title:"What is MCP? Integrate AI Agents with Databases & APIs",src:"IBM Technology",len:"short",url:YT("eur8dUO9mvE"),note:"How agents plug into tools and data through one protocol."},
+    {t:"read",title:"Equipping agents for the real world with Agent Skills",src:"Anthropic",len:"~15 min",url:"https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",note:"What skills are and how agents use them. Now an open standard used beyond Claude."},
     {t:"tool",title:"Build an AI chat agent with n8n",src:"n8n docs",len:"~1 hr",url:"https://docs.n8n.io/advanced-ai/intro-tutorial/",note:"The official step-by-step tutorial for this week's build."},
     {t:"video",title:"Learn n8n to design, develop and deploy AI agents",src:"freeCodeCamp",len:"4 hr",url:"https://www.freecodecamp.org/news/learn-n8n-to-design-develop-and-deploy-production-grade-ai-agents/",note:"Watch the first 90 minutes now. The RAG and multi-agent parts make good Week 5 practice."},
     {t:"live",title:"Beyond Simple Agents: Building with LangChain Deep Agents",src:"Gen Academy · free live session",len:"Mon, Oct 19",url:"https://maven.com/p/73db9b/beyond-simple-agents-building-with-lang-chain-deep-agents",note:"Sign up; registrants can usually get the recording if they miss it live.",opt:1},
@@ -360,7 +383,7 @@ const WEEKS = [
     intro:"n8n is a visual builder: you connect boxes instead of writing code. Its cloud trial lasts 14 days, so start it now to cover Weeks 3 and 4.",
     steps:[
       "Start the n8n Cloud free trial. Put the end date in your calendar and plan to export your workflows before then.",
-      "Get a model key. Google AI Studio offers Gemini keys with a free tier; OpenAI or Anthropic keys need a few dollars of credit. Check current limits when you sign up.",
+      "Get a model key. Google AI Studio's free tier currently covers its Gemini Flash models; Google may use free-tier data to improve its products, so don't send private information. OpenAI or Anthropic keys need a few dollars of credit. Check current limits when you sign up.",
       "Follow the official 'Build an AI chat agent' tutorial from start to finish.",
       "Add memory and two tools: a search tool (Wikipedia or web search) and a calculator.",
       "Give it a job in its instructions: when I name a company or topic, research it and reply with a 5-bullet brief and sources.",
@@ -392,7 +415,8 @@ const WEEKS = [
     {t:"read",title:"Your AI Product Needs Evals",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/evals/",note:"The case for evals, with a real assistant as the example."},
     {t:"read",title:"Creating a LLM-as-a-Judge That Drives Business Results",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/llm-judge/",note:"How to build a judge with a domain expert and pass/fail critiques."},
     {t:"read",title:"A Field Guide to Rapidly Improving AI Products",src:"Hamel Husain",len:"~30 min",url:"https://hamel.dev/blog/posts/field-guide/",note:"Error analysis in practice, and why looking at data beats dashboards."},
-    {t:"video",title:"Figma MCP vs. Paper MCP: What Evals Actually Tell You",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/figma-mcp-vs-paper-mcp-what-evals-actually-tell-yo",note:"Evals used to compare two real tools.",opt:1}
+    {t:"video",title:"Figma MCP vs. Paper MCP: What Evals Actually Tell You",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/figma-mcp-vs-paper-mcp-what-evals-actually-tell-yo",note:"Evals used to compare two real tools.",opt:1},
+    {t:"read",title:"AI Evals: Everything You Need to Know",src:"Hamel Husain & Shreya Shankar",len:"reference",url:"https://hamel.dev/blog/posts/evals-faq/",note:"Updated September 2026. Answers to 60+ practical questions; dip in when you hit a specific problem.",opt:1}
   ],
   build:{title:"An eval kit for your agent",
     intro:"You need a spreadsheet and Claude. No code. Claude plays the judge.",
@@ -457,7 +481,7 @@ const WEEKS = [
   idea:[
     "<b>Prompt injection</b> is the defining security problem for agents. Instructions hidden in content the agent reads (a web page, an email, a PDF) can override yours. Direct injection comes from the person typing; indirect injection hides in the data.",
     "Simon Willison's <b>lethal trifecta</b>: if one agent can access private data, reads untrusted content, and can send information out, an attacker can trick it into leaking that data. Remove or gate at least one of the three.",
-    "Other common risks from the OWASP list: leaking sensitive information, <b>excessive agency</b> (more tools and permissions than the job needs), trusting model output without checks, unvetted plugins or MCP servers, and runaway usage costs.",
+    "Other common risks from the OWASP list: leaking sensitive information, <b>excessive agency</b> (more tools and permissions than the job needs), trusting model output without checks, unvetted plugins or MCP servers, and runaway usage costs. Since December 2025, OWASP also publishes a separate Top 10 just for agentic applications.",
     "Defenses come in layers: give each agent the fewest permissions possible, require human approval before anything irreversible, keep agents that read untrusted content apart from agents that can send, log every action, and set spending limits. No filter stops every attack, so design as if some get through.",
     "Shipping also means watching it run: track failures and cost, keep your eval set running, version your instructions, and give users an easy way to report bad answers."
   ],
@@ -466,9 +490,10 @@ const WEEKS = [
   res:[
     {t:"video",title:"Prompt injection explained, with video, slides and a transcript",src:"Simon Willison",len:"~40 min",url:"https://simonwillison.net/2023/May/2/prompt-injection-explained/",note:"Why this attack is so hard to stop, from the person who named it."},
     {t:"read",title:"The lethal trifecta for AI agents",src:"Simon Willison",len:"~15 min",url:"https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",note:"Private data, untrusted content and external communication."},
-    {t:"read",title:"OWASP Top 10 for LLM Applications",src:"OWASP GenAI Security Project",len:"skim 30 min",url:"https://genai.owasp.org/llm-top-10/",note:"The industry checklist of the most serious risks."},
+    {t:"read",title:"OWASP Top 10 for LLM Applications (2025)",src:"OWASP GenAI Security Project",len:"skim 20 min",url:"https://genai.owasp.org/llm-top-10/",note:"The industry checklist of the most serious risks. The 2025 list is the current one on OWASP's site."},
+    {t:"read",title:"OWASP Top 10 for Agentic Applications (2026)",src:"OWASP GenAI Security Project",len:"skim 20 min",url:"https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",note:"Released December 2025: the top risks specific to autonomous agents. Download the PDF from the page."},
     {t:"video",title:"Secure AI Agents: Identity, Secrets & Access in Production",src:"Gen Academy Live Lab",len:"recording",url:"https://thegenacademy.com/lesson/secure-ai-agents-identity-secrets-access-in-produc",note:"How production agents handle credentials and permissions."},
-    {t:"play",title:"Lakera's AI-hacking game",src:"Lakera",len:"45 min",url:"https://gandalf.lakera.ai/",note:"Trick AI systems into breaking their rules. The fastest way to understand injection."},
+    {t:"play",title:"Gandalf by Lakera",src:"Lakera · free",len:"45 min",url:"https://gandalf.lakera.ai/",note:"Trick AI systems into breaking their rules. The link now opens Lakera's Agent Breaker challenges. The fastest way to understand injection."},
     {t:"course",title:"Generative AI for Everyone: Module 3",src:"Andrew Ng · Coursera",len:"~2 hr",url:URLS.coursera,note:"Responsible AI, jobs and business impact. Useful if you'll lead AI work.",opt:1}
   ],
   build:{title:"Red-team your agent, then ship",
@@ -639,8 +664,39 @@ const ARROW = `<defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerW
 function box(x,y,w,h,label,cls,sub){
   return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" class="${cls||"box"}"/><text x="${x+w/2}" y="${y+h/2+(sub?-2:4)}" text-anchor="middle">${label}</text>${sub?`<text x="${x+w/2}" y="${y+h/2+14}" text-anchor="middle" class="sm">${sub}</text>`:""}`;
 }
+const ARROW_T = `<defs><marker id="aht" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" class="ahp"/></marker></defs>`;
+const TALL = {
+  rag:`<svg class="dg tall" viewBox="0 0 340 304" role="img" aria-label="RAG pipeline: documents are chunked, embedded and stored; questions are matched to the closest chunks and answered with sources.">${ARROW_T}
+<rect x="0" y="0" width="165" height="304" rx="10" class="lane"/><rect x="175" y="0" width="165" height="304" rx="10" class="lane"/>
+<text x="10" y="20" class="sm">LOAD, ONCE</text><text x="185" y="20" class="sm">ASK, EVERY TIME</text>
+${box(10,34,145,48,"Your documents","box","PDFs, notes")}${box(10,104,145,48,"Chunks","box","short passages")}${box(10,174,145,48,"Embeddings","box","meaning as numbers")}${box(10,244,145,48,"Vector database","hot")}
+${box(185,34,145,48,"Your question","box")}${box(185,104,145,48,"Find closest","box","top 3–5 chunks")}${box(185,174,145,48,"Prompt","box","question + chunks")}${box(185,244,145,48,"Answer + sources","hot")}
+<path d="M82 82 V102" class="arrow" marker-end="url(#aht)"/><path d="M82 152 V172" class="arrow" marker-end="url(#aht)"/><path d="M82 222 V242" class="arrow" marker-end="url(#aht)"/>
+<path d="M257 82 V102" class="arrow" marker-end="url(#aht)"/><path d="M257 152 V172" class="arrow" marker-end="url(#aht)"/><path d="M257 222 V242" class="arrow" marker-end="url(#aht)"/>
+<path d="M155 268 H170 V128 H183" class="arrow" marker-end="url(#aht)"/></svg>`,
+  loop:`<svg class="dg tall" viewBox="0 0 340 434" role="img" aria-label="Agent loop: goal, plan, act with a tool, observe, check if done; loop back to plan or answer.">${ARROW_T}
+${box(95,8,150,46,"Goal","box","from you")}
+${box(95,80,150,46,"Plan","hot","pick next step")}
+${box(95,152,150,46,"Act","hot","call a tool")}
+${box(95,224,150,46,"Observe","hot","read the result")}
+${box(95,296,150,46,"Done?","box","check the goal")}
+${box(95,380,150,46,"Answer","box","to you")}
+<path d="M170 54 V78" class="arrow" marker-end="url(#aht)"/><path d="M170 126 V150" class="arrow" marker-end="url(#aht)"/><path d="M170 198 V222" class="arrow" marker-end="url(#aht)"/><path d="M170 270 V294" class="arrow" marker-end="url(#aht)"/>
+<path d="M170 342 V378" class="arrow" marker-end="url(#aht)"/><text x="178" y="365" class="sm">yes</text>
+<path d="M95 319 H58 V103 H93" class="arrow" marker-end="url(#aht)"/><text x="10" y="214" class="sm">not yet</text>
+<rect x="256" y="144" width="80" height="62" rx="8" class="warn"/><text x="296" y="164" text-anchor="middle" class="sm">STOP RULE</text><text x="296" y="181" text-anchor="middle" class="sm">max steps</text><text x="296" y="197" text-anchor="middle" class="sm">+ approval</text>
+</svg>`,
+  trifecta:`<svg class="dg tall" viewBox="0 0 340 266" role="img" aria-label="The lethal trifecta: private data, untrusted content and a way to send data out.">
+<path d="M170 50 L80 215 L260 215 Z" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 6"/>
+${box(85,8,170,56,"Private data","warn","files, email, accounts")}
+${box(4,200,162,60,"Untrusted content","warn","web pages, inbound email")}
+${box(174,200,162,60,"Can send data out","warn","email, links, APIs")}
+<text x="170" y="128" text-anchor="middle">All three in one agent</text>
+<text x="170" y="148" text-anchor="middle" class="sm">= an attacker can steal data</text>
+</svg>`
+};
 const DIAGRAMS = {
-  rag:{cap:"Top row happens once, when you load documents. Bottom row happens on every question.",svg:`<svg class="dg" viewBox="0 0 700 230" role="img" aria-label="RAG pipeline: documents are chunked, embedded and stored; questions are embedded, matched to the closest chunks, and answered with citations.">${ARROW}
+  rag:{tall:TALL.rag,cap:"The load side happens once, when you add documents. The ask side happens on every question.",svg:`<svg class="dg wide" viewBox="0 0 700 230" role="img" aria-label="RAG pipeline: documents are chunked, embedded and stored; questions are embedded, matched to the closest chunks, and answered with citations.">${ARROW}
 <rect x="0" y="6" width="700" height="96" rx="10" class="lane"/><rect x="0" y="128" width="700" height="96" rx="10" class="lane"/>
 <text x="14" y="26" class="sm">LOAD, ONCE</text><text x="14" y="148" class="sm">ASK, EVERY TIME</text>
 ${box(14,38,140,50,"Your documents","box","PDFs, notes")}${box(190,38,140,50,"Chunks","box","short passages")}${box(366,38,140,50,"Embeddings","box","meaning as numbers")}${box(542,38,144,50,"Vector database","hot")}
@@ -648,7 +704,7 @@ ${box(14,160,140,50,"Your question","box")}${box(190,160,140,50,"Find closest","
 <path d="M154 63 H188" class="arrow" marker-end="url(#ah)"/><path d="M330 63 H364" class="arrow" marker-end="url(#ah)"/><path d="M506 63 H540" class="arrow" marker-end="url(#ah)"/>
 <path d="M154 185 H188" class="arrow" marker-end="url(#ah)"/><path d="M330 185 H364" class="arrow" marker-end="url(#ah)"/><path d="M506 185 H540" class="arrow" marker-end="url(#ah)"/>
 <path d="M614 88 V112 H260 V158" class="arrow" marker-end="url(#ah)"/></svg>`},
-  loop:{cap:"The agent loop. The model chooses the next tool each time round; your stop rule and approval step keep it safe.",svg:`<svg class="dg" viewBox="0 0 700 250" role="img" aria-label="Agent loop: goal, plan, act with a tool, observe the result, check if done; loop back to plan or finish. A stop rule and an approval step guard the loop.">${ARROW}
+  loop:{tall:TALL.loop,cap:"The agent loop. The model chooses the next tool each time round; your stop rule and approval step keep it safe.",svg:`<svg class="dg wide" viewBox="0 0 700 250" role="img" aria-label="Agent loop: goal, plan, act with a tool, observe the result, check if done; loop back to plan or finish. A stop rule and an approval step guard the loop.">${ARROW}
 ${box(14,96,120,54,"Goal","box","from you")}
 ${box(186,30,140,54,"Plan","hot","pick next step")}
 ${box(400,30,140,54,"Act","hot","call a tool")}
@@ -663,7 +719,7 @@ ${box(572,96,116,54,"Answer","box","to you")}
 <path d="M256 220 V238 H630 V152" class="arrow" marker-end="url(#ah)"/><text x="420" y="234" class="sm">yes</text>
 <rect x="560" y="10" width="128" height="62" rx="8" class="warn"/><text x="624" y="34" text-anchor="middle" class="sm">STOP RULE</text><text x="624" y="52" text-anchor="middle" class="sm">max steps · approval</text>
 </svg>`},
-  trifecta:{cap:"Any agent with all three can be tricked into leaking data. Take away one leg, or put a human approval on it.",svg:`<svg class="dg" viewBox="0 0 700 250" role="img" aria-label="The lethal trifecta: private data, untrusted content and a way to send data out. All three together create risk.">
+  trifecta:{tall:TALL.trifecta,cap:"Any agent with all three can be tricked into leaking data. Take away one leg, or put a human approval on it.",svg:`<svg class="dg wide" viewBox="0 0 700 250" role="img" aria-label="The lethal trifecta: private data, untrusted content and a way to send data out. All three together create risk.">
 <path d="M350 40 L150 210 L550 210 Z" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 6"/>
 ${box(270,14,160,56,"Private data","warn","files, email, accounts")}
 ${box(60,186,190,56,"Untrusted content","warn","web pages, inbound email")}
@@ -705,7 +761,7 @@ function renderWeek(w){
   const idx = WEEKS.indexOf(w);
   const prev = idx===0 ? {id:"start",label:"Start here"} : {id:WEEKS[idx-1].id,label:"Week "+WEEKS[idx-1].n};
   const next = idx===WEEKS.length-1 ? {id:"capstone",label:"Capstone"} : {id:WEEKS[idx+1].id,label:"Week "+WEEKS[idx+1].n};
-  const dg = w.diagram ? `<div class="figure">${DIAGRAMS[w.diagram].svg}<p class="figcap">${DIAGRAMS[w.diagram].cap}</p></div>` : "";
+  const dg = w.diagram ? `<div class="figure">${DIAGRAMS[w.diagram].svg}${DIAGRAMS[w.diagram].tall}<p class="figcap">${DIAGRAMS[w.diagram].cap}</p></div>` : "";
   return `
   <section aria-labelledby="h-${w.id}">
     <div class="wk-head">
@@ -718,7 +774,7 @@ function renderWeek(w){
         <section class="block"><h3>The idea</h3><div class="prose">${w.idea.map(p=>`<p>${p}</p>`).join("")}</div>${dg}</section>
         <section class="block"><h3>Watch &amp; read · about 4–5 hrs</h3><ul class="res">${w.res.map((r,i)=>resItem(w,r,i)).join("")}</ul></section>
         <section class="block build"><h3>Build · about 5 hrs</h3><p class="build-title">${w.build.title}</p><p class="build-intro">${w.build.intro}</p>
-          <ol class="steps">${w.build.steps.map((s,i)=>{const k=w.id+"-b"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Step "+(i+1)+" done")}<span>${s}</span></li>`;}).join("")}</ol>
+          <ol class="steps">${w.build.steps.map((s,i)=>{const k=w.id+"-b"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Step "+(i+1)+" done")}<label class="lbl txt" for="c-${k}">${s}</label></li>`;}).join("")}</ol>
           ${w.build.cap?`<p class="cap-note">${w.build.cap}</p>`:""}
           <p class="done-when"><b>Done when</b>${w.build.done}</p>
         </section>
@@ -751,7 +807,7 @@ function renderStart(){
         <section class="block"><h3>Mapped to the paid course</h3><div class="tbl-wrap"><table><thead><tr><th>Gen Academy week</th><th>This course</th></tr></thead><tbody>${GA_MAP.map((r,i)=>`<tr><td><span class="mono" style="color:var(--muted)">0${i+1}</span> ${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</tbody></table></div></section>
       </div>
       <aside class="side">
-        <section class="card"><h3>Setup checklist</h3><ul class="checklist">${START_CHECKS.map((c,i)=>{const k="st-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c)}<span>${c}</span></li>`;}).join("")}</ul></section>
+        <section class="card"><h3>Setup checklist</h3><ul class="checklist">${START_CHECKS.map((c,i)=>{const k="st-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c)}<label class="lbl txt" for="c-${k}">${c}</label></li>`;}).join("")}</ul></section>
         <section class="card"><h3>What it costs</h3><div class="cost">
           <div><span class="k free">Free</span><span>Every video, course and reading here; NotebookLM; LM Studio; the Lakera game; Claude if you already use it.</span></div>
           <div><span class="k paid">Maybe</span><span>n8n Cloud after its 14-day trial (Starter is about €24 a month), only if you keep building there.</span></div>
@@ -810,7 +866,7 @@ Next: what you would build next.`;
         </div></section>
       </div>
       <aside class="side">
-        <section class="card"><h3>Milestones</h3><ul class="checklist">${CAP_CHECKS.map((c,i)=>{const k="cp-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c[1])}<span><span class="when">${c[0]}</span>${c[1]}</span></li>`;}).join("")}</ul></section>
+        <section class="card"><h3>Milestones</h3><ul class="checklist">${CAP_CHECKS.map((c,i)=>{const k="cp-"+i;return `<li class="${state.done[k]?"is-done":""}">${chk(k,"Done: "+c[1])}<label class="lbl txt" for="c-${k}"><span class="when">${c[0]}</span>${c[1]}</label></li>`;}).join("")}</ul></section>
         <section class="card"><h3>Ask your tutor</h3>${tutorBlock(["Here's my capstone idea: [describe]. Turn it into a one-page spec: user, problem, inputs, outputs, tools, risks and what a passing answer looks like.","Here's my capstone spec. Suggest 20 eval cases, including 5 edge cases and 3 prompt-injection attempts.\n\n[paste]"])}</section>
       </aside>
     </div>
@@ -910,6 +966,7 @@ loadLocal();
 renderAll();
 setSync("local");
 initCloud();
+window.addEventListener("hashchange", ()=>{ const h = (location.hash||"").slice(1); if(h && h!==current && TABS.some(t=>t.id===h)) go(h); });
 </script>
 
 </body>
