@@ -35,3 +35,4 @@ Links and facts were checked on October 8, 2026. The page works on phones as wel
 ## Costs
 
 Everything is free except, optionally: n8n Cloud after its 14-day trial, a few dollars of AI model credit if you don't use a free tier, and a small optional fine-tuning run in Week 5.
+
